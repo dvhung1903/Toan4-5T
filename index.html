@@ -635,7 +635,9 @@ function genAddQuestion(){
     a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(a+1));
     result=a-b;
   }
-  return {a,b,op,result,hidden:hiddenPart,mode:'add'};
+  // Khi ẩn dấu và một hạng số là 0 → cả + và - đều đúng
+  const dualOp = hiddenPart==='op' && (a===0 || b===0);
+  return {a,b,op,result,hidden:hiddenPart,mode:'add',dualOp};
 }
 
 function genMulQuestion(){
@@ -681,19 +683,26 @@ function renderQuestion(q){
   document.getElementById('question-text').innerHTML=txt;
 }
 
+// Lưu correct answer ở module level — có thể là string hoặc array (dualOp)
+let currentCorrect = null;
+
 function renderAnswers(q){
-  const correct=getAnswer(q);
-  const wrongs=genWrongAnswers(correct,q);
-  const options=[correct,...wrongs].sort(()=>Math.random()-.5);
-  const grid=document.getElementById('answers-grid');
-  grid.innerHTML='';
+  const correct = getAnswer(q);
+  // dualOp: cả + và - đều đúng
+  if(q.dualOp){
+    currentCorrect = ['+', '-'];
+  } else {
+    currentCorrect = String(correct);
+  }
+  const wrongs = genWrongAnswers(correct, q);
+  const options = [correct, ...wrongs].sort(()=>Math.random()-.5);
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = '';
   options.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.className='ans-btn';
-    btn.textContent=String(opt);
-    btn.dataset.value=String(opt);
-    btn.dataset.correct=String(correct);
-    btn.onclick=()=>selectAnswer(btn,q);
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = String(opt);
+    btn.onclick = ()=>selectAnswer(btn, q);
     grid.appendChild(btn);
   });
 }
@@ -732,48 +741,62 @@ function showQuestion(){
 }
 
 async function selectAnswer(btn, q){
-  if(earnedThisQ) return; // đã trả lời đúng rồi, không làm gì
+  if(earnedThisQ) return;
 
-  const chosen = btn.dataset.value;
-  const correct = btn.dataset.correct;
+  const chosen = btn.textContent.trim();
+  // Kiểm tra đúng: currentCorrect có thể là string hoặc array (dualOp)
+  const isCorrect = Array.isArray(currentCorrect)
+    ? currentCorrect.includes(chosen)
+    : chosen === currentCorrect;
 
-  if(chosen === correct){
-    // ✅ Đúng
+  if(isCorrect){
+    // ✅ Đúng (hoặc cả hai đều đúng với dualOp)
     btn.classList.add('correct');
-    document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
-    earnedThisQ=true;
-    answered=true;
+    // Nếu dualOp: highlight cả 2 đáp án đúng
+    if(Array.isArray(currentCorrect)){
+      document.querySelectorAll('.ans-btn').forEach(b=>{
+        if(currentCorrect.includes(b.textContent.trim())) b.classList.add('correct');
+        b.disabled = true;
+      });
+    } else {
+      document.querySelectorAll('.ans-btn').forEach(b=>{ b.disabled = true; });
+    }
+    earnedThisQ = true;
+    answered = true;
 
-    let pts=0;
-    if(q.mode==='add') pts=1;
-    else pts=(q.a<6||q.b<6)?2:4;
-    player.weekScore+=pts;
-    sessionScore+=pts;
-    showScoreChange('+'+pts,'plus');
-    document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
-    document.getElementById('hs-score').textContent=player.weekScore;
-    apiPost('score',{name:player.name, delta:pts, mode:lessonMode});
+    let pts = 0;
+    if(q.mode==='add') pts = 1;
+    else pts = (q.a<6 || q.b<6) ? 2 : 4;
+    player.weekScore += pts;
+    sessionScore += pts;
+    showScoreChange('+'+pts, 'plus');
+    document.getElementById('gi-score').textContent = '⭐ '+player.weekScore;
+    document.getElementById('hs-score').textContent = player.weekScore;
+    apiPost('score', {name:player.name, delta:pts, mode:lessonMode});
     document.getElementById('btn-next').classList.add('enabled');
 
   } else {
     // ❌ Sai
     btn.classList.add('wrong');
-    btn.disabled=true;
+    btn.disabled = true;
     wrongCount++;
-    if(player.weekScore>0){
-      player.weekScore=Math.max(0,player.weekScore-1);
-      showScoreChange('-1','minus');
-      document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
-      document.getElementById('hs-score').textContent=player.weekScore;
-      apiPost('score',{name:player.name, delta:-1, mode:lessonMode});
+    if(player.weekScore > 0){
+      player.weekScore = Math.max(0, player.weekScore-1);
+      showScoreChange('-1', 'minus');
+      document.getElementById('gi-score').textContent = '⭐ '+player.weekScore;
+      document.getElementById('hs-score').textContent = player.weekScore;
+      apiPost('score', {name:player.name, delta:-1, mode:lessonMode});
     }
-    // Sau 2 lần sai: highlight đáp án đúng
-    if(wrongCount>=2){
+    // Sau 2 lần sai: highlight đáp án đúng + cho next
+    if(wrongCount >= 2){
       document.querySelectorAll('.ans-btn').forEach(b=>{
-        if(b.dataset.value===correct) b.classList.add('correct');
-        b.disabled=true;
+        const val = b.textContent.trim();
+        const isRight = Array.isArray(currentCorrect)
+          ? currentCorrect.includes(val)
+          : val === currentCorrect;
+        if(isRight) b.classList.add('correct');
+        b.disabled = true;
       });
-      // Vẫn cho next nhưng không cộng điểm
       document.getElementById('btn-next').classList.add('enabled');
     }
   }
