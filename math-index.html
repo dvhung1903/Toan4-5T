@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cùng Bé Học Toán</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{display:flex;flex-direction:column;align-items:center;padding:0 0 32px}
+
+/* ── SCREEN SYSTEM ── */
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:480px;padding:16px;}
+.screen.active{display:flex;}
+
+/* ── HEADER ── */
+#app-header{
+  width:100%;max-width:480px;
+  background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;position:sticky;top:0;z-index:100;
+}
+#app-header h1{font-size:16px;font-weight:800;color:#fff;letter-spacing:.5px;}
+#header-score{font-size:13px;color:#ffe;font-weight:700;}
+#header-btns{display:flex;gap:8px;}
+.hbtn{border:none;background:rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+.hbtn:active{background:rgba(255,255,255,0.35);}
+
+/* ── CARDS ── */
+.card{
+  background:#fff;border-radius:24px;padding:24px 20px;
+  width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.18);margin-bottom:16px;
+}
+.card-title{font-size:18px;font-weight:800;color:#4a3a7a;margin-bottom:6px;text-align:center;}
+.card-sub{font-size:12px;color:#9080b0;text-align:center;margin-bottom:16px;}
+
+/* ── AD BANNER ── */
+.ad-banner{width:100%;max-width:480px;min-height:60px;margin:8px 0;text-align:center;}
+
+/* ── INTERSTITIAL ── */
+#interstitial{
+  display:none;position:fixed;inset:0;z-index:99999;
+  background:rgba(10,6,28,0.97);
+  flex-direction:column;align-items:center;justify-content:center;padding:20px;
+}
+#interstitial.show{display:flex;}
+#inter-box{
+  width:min(420px,100%);background:#1a1030;border:1.5px solid #5a3a9a;
+  border-radius:20px;overflow:hidden;
+}
+#inter-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;background:#241540;
+  font-size:11px;color:#7060a0;
+}
+#inter-skip{
+  border:none;background:#3a2460;color:#c8b0f0;font-size:12px;font-weight:700;
+  cursor:pointer;padding:5px 14px;border-radius:8px;
+}
+#inter-skip:disabled{color:#5a4880;cursor:not-allowed;}
+#inter-content{min-height:260px;display:flex;align-items:center;justify-content:center;}
+#inter-footer{padding:8px;text-align:center;font-size:10px;color:#3a2860;}
+
+/* ── LOGIN / REGISTER ── */
+.big-emoji{font-size:64px;text-align:center;margin-bottom:8px;}
+input.name-input{
+  width:100%;padding:14px;border-radius:14px;
+  border:2px solid #d0c0f0;background:#f8f6ff;
+  font-size:18px;font-weight:700;text-align:center;color:#3a2a6a;
+  outline:none;margin-bottom:8px;
+}
+input.name-input:focus{border-color:#7c4dff;}
+.err-msg{font-size:12px;color:#e53935;min-height:18px;text-align:center;margin-bottom:8px;}
+.btn-primary{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,#7c4dff,#651fff);color:#fff;
+  font-size:18px;font-weight:800;cursor:pointer;
+  box-shadow:0 4px 16px rgba(124,77,255,0.4);
+}
+.btn-primary:active{transform:scale(.97);}
+.btn-primary:disabled{background:#b0a0d0;box-shadow:none;cursor:not-allowed;}
+.link-btn{background:none;border:none;color:#7c4dff;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;}
+
+/* ── MENU ── */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;}
+.menu-card{
+  background:linear-gradient(135deg,#f093fb,#f5576c);
+  border-radius:20px;padding:20px 12px;text-align:center;cursor:pointer;
+  box-shadow:0 4px 16px rgba(240,80,100,0.3);transition:transform .15s;
+  border:none;
+}
+.menu-card:nth-child(2){background:linear-gradient(135deg,#4facfe,#00f2fe);}
+.menu-card:nth-child(3){background:linear-gradient(135deg,#43e97b,#38f9d7);}
+.menu-card:nth-child(4){background:linear-gradient(135deg,#fa709a,#fee140);}
+.menu-card:active{transform:scale(.95);}
+.menu-card .mc-icon{font-size:40px;margin-bottom:8px;}
+.menu-card .mc-title{font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.menu-card .mc-desc{font-size:11px;color:rgba(255,255,255,0.85);margin-top:4px;}
+.player-badge{
+  background:rgba(255,255,255,0.2);border-radius:14px;padding:10px 16px;
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;width:100%;
+}
+.player-badge .pb-name{font-size:15px;font-weight:800;color:#fff;}
+.player-badge .pb-score{font-size:13px;color:#ffe;margin-left:auto;}
+.player-badge .pb-rank{font-size:12px;color:rgba(255,255,255,0.7);}
+.prev-best{
+  background:linear-gradient(135deg,#ffd700,#ffb300);border-radius:16px;
+  padding:12px 16px;margin-bottom:12px;width:100%;text-align:center;
+}
+.prev-best .pb2-title{font-size:11px;font-weight:700;color:#5a3a00;}
+.prev-best .pb2-name{font-size:18px;font-weight:800;color:#3a2000;}
+.prev-best .pb2-score{font-size:13px;color:#6a4a10;margin-top:2px;}
+.daily-progress{
+  background:#f0eeff;border-radius:12px;padding:10px 14px;
+  font-size:12px;color:#7060a0;margin-bottom:12px;width:100%;
+}
+.daily-progress strong{color:#5a3a9a;}
+
+/* ── GAME SCREEN ── */
+#game-header{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;margin-bottom:12px;
+}
+.game-info{font-size:13px;color:#fff;font-weight:700;background:rgba(255,255,255,0.2);padding:6px 12px;border-radius:10px;}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.2);border-radius:4px;margin-bottom:14px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#7c4dff,#e040fb);border-radius:4px;transition:width .4s;}
+
+.question-card{
+  background:#fff;border-radius:24px;padding:28px 20px 20px;
+  width:100%;text-align:center;margin-bottom:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+}
+.question-label{font-size:12px;font-weight:700;color:#b0a0d0;letter-spacing:1px;margin-bottom:10px;}
+.question-text{
+  font-size:42px;font-weight:800;color:#3a2a6a;letter-spacing:4px;
+  margin-bottom:6px;line-height:1.2;
+}
+.question-blank{
+  display:inline-block;min-width:48px;border-bottom:4px solid #7c4dff;
+  color:#7c4dff;font-size:42px;font-weight:800;text-align:center;
+}
+.score-change{
+  font-size:22px;font-weight:800;text-align:center;min-height:30px;
+  animation:scoreAnim .6s ease;
+}
+.score-change.plus{color:#00c853;}
+.score-change.minus{color:#e53935;}
+@keyframes scoreAnim{from{transform:scale(1.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+.answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:14px;}
+.ans-btn{
+  padding:18px 8px;border-radius:18px;border:3px solid transparent;
+  font-size:26px;font-weight:800;color:#3a2a6a;background:#f0eeff;
+  cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+.ans-btn:active{transform:scale(.94);}
+.ans-btn.correct{background:#e8f5e9;border-color:#00c853;color:#00c853;}
+.ans-btn.wrong{background:#ffebee;border-color:#e53935;color:#e53935;animation:shake .3s;}
+.ans-btn:disabled{cursor:not-allowed;opacity:.7;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+.btn-next{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,#7c4dff,#651fff);color:#fff;
+  font-size:17px;font-weight:800;cursor:pointer;
+  box-shadow:0 4px 16px rgba(124,77,255,0.4);
+  opacity:.4;pointer-events:none;transition:opacity .2s;
+}
+.btn-next.enabled{opacity:1;pointer-events:all;}
+.btn-next.enabled:active{transform:scale(.97);}
+
+/* ── BREAK / RESULT ── */
+.break-emoji{font-size:80px;text-align:center;margin:20px 0 12px;}
+.result-score{font-size:48px;font-weight:800;color:#7c4dff;text-align:center;margin:8px 0;}
+.result-rank{font-size:16px;color:#9080b0;text-align:center;margin-bottom:16px;}
+
+/* ── LEADERBOARD ── */
+.lb-row{
+  display:grid;grid-template-columns:32px 1fr auto;gap:8px;
+  align-items:center;padding:10px 12px;border-radius:12px;margin-bottom:6px;
+  background:#f8f6ff;
+}
+.lb-row.me{background:#ede7ff;border:2px solid #7c4dff;}
+.lb-row.top1{background:linear-gradient(135deg,#fff9c4,#fff3e0);}
+.lb-row.top2{background:#f5f5f5;}
+.lb-row.top3{background:#fff8f0;}
+.lb-rank{font-size:16px;font-weight:800;text-align:center;}
+.lb-name{font-size:14px;font-weight:700;color:#3a2a6a;}
+.lb-score{font-size:15px;font-weight:800;color:#7c4dff;}
+
+/* ── PAGE SCREENS (about/privacy) ── */
+.page-screen{
+  display:none;width:100%;max-width:480px;
+  padding:16px;flex-direction:column;
+}
+.page-screen.active{display:flex;}
+.page-back-btn{
+  background:rgba(255,255,255,0.2);border:none;color:#fff;
+  border-radius:12px;padding:8px 16px;font-size:14px;font-weight:700;
+  cursor:pointer;align-self:flex-start;margin-bottom:12px;
+}
+.page-content{background:#fff;border-radius:20px;padding:20px;color:#4a3a7a;font-size:14px;line-height:1.7;}
+.page-content h2{font-size:18px;font-weight:800;color:#3a2a6a;margin-bottom:12px;}
+.page-content h3{font-size:15px;font-weight:700;color:#5a3a9a;margin:14px 0 6px;}
+.page-content p{color:#6a5a8a;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<!-- ══ STICKY HEADER ══ -->
+<div id="app-header">
+  <h1>🧮 Cùng Bé Học Toán</h1>
+  <div id="header-score" style="display:none">⭐ <span id="hs-score">0</span></div>
+  <div id="header-btns">
+    <button class="hbtn" onclick="showAbout()">ℹ️</button>
+    <button class="hbtn" onclick="showPrivacy()">🔒</button>
+  </div>
+</div>
+
+<!-- ══ TOP BANNER AD ══ -->
+<div class="ad-banner">
+  <ins class="adsbygoogle"
+       style="display:block;width:100%;min-height:60px;"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+       data-ad-slot="SLOT_BANNER_TOP"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+</div>
+
+<!-- ══ SCREEN: LOGIN ══ -->
+<div id="screen-login" class="screen active">
+  <div class="big-emoji">🦉</div>
+  <div class="card">
+    <div class="card-title">Chào mừng bé!</div>
+    <div class="card-sub">Nhập tên để bắt đầu học toán nhé 😊</div>
+    <input id="login-input" class="name-input" maxlength="16" placeholder="Tên của bé..." autocomplete="off" spellcheck="false"/>
+    <div id="login-err" class="err-msg"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">▶ Bắt đầu!</button>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:#9080b0">Chưa có tài khoản?</div>
+    <div style="text-align:center">
+      <button class="link-btn" onclick="switchToRegister()">Đăng ký tên mới →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: REGISTER ══ -->
+<div id="screen-register" class="screen">
+  <div class="big-emoji">✏️</div>
+  <div class="card">
+    <div class="card-title">Đăng ký tên mới</div>
+    <div class="card-sub">4–16 ký tự · Không trùng với bạn khác</div>
+    <input id="reg-input" class="name-input" maxlength="16" placeholder="Đặt tên cho bé..." autocomplete="off" spellcheck="false"/>
+    <div id="reg-err" class="err-msg"></div>
+    <button class="btn-primary" id="reg-btn" onclick="doRegister()">✅ Đăng ký</button>
+    <div style="text-align:center">
+      <button class="link-btn" onclick="showScreen('screen-login')">← Đã có tài khoản</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: MENU ══ -->
+<div id="screen-menu" class="screen">
+  <div id="prev-best-banner" style="display:none" class="prev-best">
+    <div class="pb2-title">🏆 NGƯỜI XUẤT SẮC TUẦN TRƯỚC</div>
+    <div class="pb2-name" id="pb-name">—</div>
+    <div class="pb2-score" id="pb-score">0 điểm</div>
+  </div>
+  <div class="player-badge">
+    <span style="font-size:28px">🧒</span>
+    <div>
+      <div class="pb-name" id="menu-player-name">Bé</div>
+      <div class="pb-rank" id="menu-player-rank">Hạng —</div>
+    </div>
+    <div class="pb-score">⭐ <span id="menu-player-score">0</span></div>
+  </div>
+  <div class="daily-progress" id="daily-info">📅 Hôm nay: cộng trừ <strong id="dp-add">0</strong>/30 · nhân <strong id="dp-mul">0</strong>/30</div>
+  <div class="card" style="padding:16px">
+    <div class="card-title" style="font-size:15px;margin-bottom:12px">Chọn bài học</div>
+    <div class="menu-grid">
+      <button class="menu-card" onclick="startLesson('add')">
+        <div class="mc-icon">➕</div>
+        <div class="mc-title">Bài 1</div>
+        <div class="mc-desc">Cộng & Trừ 0–10</div>
+      </button>
+      <button class="menu-card" onclick="startLesson('mul')">
+        <div class="mc-icon">✖️</div>
+        <div class="mc-title">Bài 2</div>
+        <div class="mc-desc">Bảng cửu chương</div>
+      </button>
+      <button class="menu-card" onclick="showLeaderboard(false)">
+        <div class="mc-icon">🏆</div>
+        <div class="mc-title">Bảng xếp hạng</div>
+        <div class="mc-desc">Top 10 tuần này</div>
+      </button>
+      <button class="menu-card" onclick="showAbout()">
+        <div class="mc-icon">📚</div>
+        <div class="mc-title">Giới thiệu</div>
+        <div class="mc-desc">Cách chơi</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: GAME ══ -->
+<div id="screen-game" class="screen">
+  <div id="game-header">
+    <div class="game-info" id="gi-lesson">Bài 1</div>
+    <div class="game-info" id="gi-progress">1/10</div>
+    <div class="game-info" id="gi-score">⭐ 0</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="question-card">
+    <div class="question-label">PHÉP TÍNH</div>
+    <div class="question-text" id="question-text">? + ? = ?</div>
+    <div class="score-change" id="score-change"></div>
+  </div>
+  <div class="answers-grid" id="answers-grid"></div>
+  <button class="btn-next" id="btn-next" onclick="nextQuestion()">Câu tiếp theo →</button>
+</div>
+
+<!-- ══ SCREEN: BREAK ══ -->
+<div id="screen-break" class="screen">
+  <div class="break-emoji">☕</div>
+  <div class="card">
+    <div class="card-title">Nghỉ giải lao nào!</div>
+    <div class="card-sub">Bé đã làm xong 10 câu rồi 🎉</div>
+    <div class="result-score" id="break-score">0 điểm</div>
+    <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:16px" id="break-remaining"></div>
+    <button class="btn-primary" id="break-continue" onclick="continueLesson()">▶ Tiếp tục!</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);margin-top:10px" onclick="goMenu()">🏠 Về menu</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: RESULT ══ -->
+<div id="screen-result" class="screen">
+  <div class="break-emoji">🎊</div>
+  <div class="card">
+    <div class="card-title">Hoàn thành bài học!</div>
+    <div class="result-score" id="result-score">0 điểm</div>
+    <div class="result-rank" id="result-rank">Hạng —</div>
+    <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:16px">📅 Hôm nay bé đã dùng hết lượt rồi, ngày mai tiếp tục nhé!</div>
+
+    <!-- Leaderboard inside result -->
+    <div class="card-title" style="font-size:14px;margin-bottom:10px">🏆 Top 10 tuần này</div>
+    <div id="result-lb"></div>
+
+    <!-- Banner ad in result -->
+    <div class="ad-banner" style="margin:12px 0">
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:50px;"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="SLOT_BANNER_RESULT"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <button class="btn-primary" onclick="goMenu()">🏠 Về menu</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LEADERBOARD ══ -->
+<div id="screen-lb" class="screen">
+  <div class="card">
+    <div class="card-title">🏆 Bảng Xếp Hạng</div>
+    <div class="card-sub" id="lb-sub">Top 10 tuần này</div>
+    <div id="lb-list"></div>
+    <button class="btn-primary" style="margin-top:12px" onclick="goMenu()">🏠 Về menu</button>
+  </div>
+</div>
+
+<!-- ══ INTERSTITIAL AD ══ -->
+<div id="interstitial">
+  <div id="inter-box">
+    <div id="inter-top">
+      <span>Quảng cáo</span>
+      <span id="inter-cd">5s</span>
+      <button id="inter-skip" disabled onclick="closeInter()">Bỏ qua ✕</button>
+    </div>
+    <div id="inter-content">
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:250px;"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="SLOT_INTERSTITIAL"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <div id="inter-footer">Cảm ơn bé đã ủng hộ 💜</div>
+  </div>
+</div>
+
+<!-- ══ PAGE: ABOUT ══ -->
+<div id="page-about" class="page-screen">
+  <button class="page-back-btn" onclick="hidePage()">← Quay lại</button>
+  <div class="page-content">
+    <h2>📚 Giới thiệu</h2>
+    <p><strong>Cùng Bé Học Toán</strong> là ứng dụng học toán vui nhộn dành cho bé 4–5 tuổi, giúp bé làm quen với phép tính cộng, trừ và bảng cửu chương thông qua hình thức trắc nghiệm thú vị.</p>
+    <h3>🎮 Cách chơi</h3>
+    <p>Bé chọn một trong hai bài học: <strong>Cộng & Trừ</strong> hoặc <strong>Bảng cửu chương</strong>. Mỗi lượt gồm 10 câu hỏi. Mỗi ngày mỗi bé chỉ làm tối đa 30 câu mỗi bài.</p>
+    <h3>⭐ Tính điểm</h3>
+    <p>Cộng trừ: đúng +1 điểm · sai -1 điểm (tối thiểu 0)</p>
+    <p>Nhân (thừa số &lt;6): đúng +2 · sai -1</p>
+    <p>Nhân (thừa số ≥6): đúng +4 · sai -1</p>
+    <h3>🏆 Bảng xếp hạng</h3>
+    <p>Điểm được cộng dồn trong vòng 1 tuần. Sau mỗi tuần, bảng xếp hạng được làm mới và người dẫn đầu tuần trước sẽ được vinh danh!</p>
+  </div>
+</div>
+
+<!-- ══ PAGE: PRIVACY ══ -->
+<div id="page-privacy" class="page-screen">
+  <button class="page-back-btn" onclick="hidePage()">← Quay lại</button>
+  <div class="page-content">
+    <h2>🔒 Chính Sách Bảo Mật</h2>
+    <p style="color:#9080b0;font-size:11px">Cập nhật: Tháng 4/2026</p>
+    <h3>1. Thông tin thu thập</h3>
+    <p>Chúng tôi chỉ thu thập tên hiển thị và điểm số mà bé tự nhập. Không thu thập email, số điện thoại hay thông tin cá nhân khác.</p>
+    <h3>2. Mục đích sử dụng</h3>
+    <p>Tên và điểm số được lưu vào bảng xếp hạng chung để bé có thể so sánh với các bạn khác.</p>
+    <h3>3. Quảng cáo</h3>
+    <p>Ứng dụng hiển thị quảng cáo qua Google AdSense. Các mạng quảng cáo có thể sử dụng cookie để hiển thị quảng cáo phù hợp. Bạn có thể từ chối quảng cáo cá nhân hóa tại <a href="https://www.youronlinechoices.com" target="_blank">youronlinechoices.com</a>.</p>
+    <h3>4. Cookie</h3>
+    <p>Ứng dụng dùng localStorage để lưu tên bé trên thiết bị. Mạng quảng cáo bên thứ ba có thể đặt cookie riêng.</p>
+    <h3>5. Trẻ em</h3>
+    <p>Ứng dụng này dành cho trẻ em dưới sự giám sát của phụ huynh. Chúng tôi không cố ý thu thập dữ liệu của trẻ em mà không có sự đồng ý của phụ huynh.</p>
+    <h3>6. Lưu trữ dữ liệu</h3>
+    <p>Dữ liệu bảng xếp hạng được lưu trữ trên Upstash Redis và được làm mới hàng tuần.</p>
+    <h3>7. Liên hệ</h3>
+    <p>Mọi thắc mắc về quyền riêng tư, vui lòng liên hệ qua kênh phân phối ứng dụng.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const API = '/api/math';
+const PLAYER_KEY = 'mathgame_player_v1';
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let player = { name:'', weekScore:0, dailyAddDone:0, dailyMulDone:0 };
+let lessonMode = 'add'; // 'add' | 'mul'
+let questions = [];
+let qIndex = 0;
+let sessionScore = 0;
+let answered = false;
+let earnedThisQ = false;
+let wrongCount = 0;
+let deathCount = 0;
+let _interLoaded = false;
+let _interTimer = null;
+let _interCb = null;
+let _bannerTopLoaded = false;
+let _bannerResultLoaded = false;
+
+// ═══════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ═══════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.page-screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showAbout(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.page-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-about').classList.add('active');
+  window.scrollTo(0,0);
+}
+function showPrivacy(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.page-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-privacy').classList.add('active');
+  window.scrollTo(0,0);
+}
+function hidePage(){
+  document.querySelectorAll('.page-screen').forEach(s=>s.classList.remove('active'));
+  showScreen('screen-menu');
+}
+
+function goMenu(){
+  showScreen('screen-menu');
+  refreshMenuUI();
+}
+
+// ═══════════════════════════════════════════
+// ADS
+// ═══════════════════════════════════════════
+function initBanners(){
+  try{
+    if(!_bannerTopLoaded){
+      (window.adsbygoogle=window.adsbygoogle||[]).push({});
+      _bannerTopLoaded=true;
+    }
+  } catch(e){}
+}
+function initResultBanner(){
+  try{
+    if(!_bannerResultLoaded){
+      (window.adsbygoogle=window.adsbygoogle||[]).push({});
+      _bannerResultLoaded=true;
+    }
+  } catch(e){}
+}
+
+function maybeInterstitial(cb){
+  deathCount++;
+  if(deathCount % 3 !== 0){ cb(); return; }
+  const ov = document.getElementById('interstitial');
+  ov.classList.add('show');
+  _interCb = cb;
+  if(!_interLoaded){
+    try{
+      (window.adsbygoogle=window.adsbygoogle||[]).push({});
+      _interLoaded=true;
+    } catch(e){}
+  }
+  let secs=5;
+  const cd=document.getElementById('inter-cd');
+  const sk=document.getElementById('inter-skip');
+  cd.textContent=secs+'s'; sk.disabled=true;
+  clearInterval(_interTimer);
+  _interTimer=setInterval(()=>{
+    secs--;
+    cd.textContent=secs>0?secs+'s':'';
+    if(secs<=0){
+      clearInterval(_interTimer);
+      sk.disabled=false;
+      _interTimer=setTimeout(()=>closeInter(),2000);
+    }
+  },1000);
+}
+function closeInter(){
+  clearInterval(_interTimer); clearTimeout(_interTimer);
+  document.getElementById('interstitial').classList.remove('show');
+  if(typeof _interCb==='function'){ const c=_interCb; _interCb=null; c(); }
+}
+
+// ═══════════════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════════════
+async function apiPost(action, body){
+  try{
+    const r=await fetch(`${API}?action=${action}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    return await r.json();
+  } catch(e){ return {ok:false,error:'Mất kết nối'}; }
+}
+async function apiGet(action){
+  try{
+    const r=await fetch(`${API}?action=${action}`);
+    return await r.json();
+  } catch(e){ return {ok:false}; }
+}
+
+// ═══════════════════════════════════════════
+// LOGIN / REGISTER
+// ═══════════════════════════════════════════
+function switchToRegister(){ showScreen('screen-register'); }
+
+async function doLogin(){
+  const name = document.getElementById('login-input').value.trim();
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  if(name.length<4||name.length>16){ err.textContent='Tên phải từ 4–16 ký tự'; return; }
+  btn.disabled=true; btn.textContent='Đang tải...';
+  const res = await apiPost('login',{name});
+  btn.disabled=false; btn.textContent='▶ Bắt đầu!';
+  if(!res.ok){ err.textContent=res.error||'Không tìm thấy tên, hãy đăng ký'; return; }
+  err.textContent='';
+  player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone};
+  localStorage.setItem(PLAYER_KEY, res.name);
+  afterLogin();
+}
+
+async function doRegister(){
+  const name = document.getElementById('reg-input').value.trim();
+  const err = document.getElementById('reg-err');
+  const btn = document.getElementById('reg-btn');
+  if(name.length<4||name.length>16){ err.textContent='Tên phải từ 4–16 ký tự'; return; }
+  btn.disabled=true; btn.textContent='Đang đăng ký...';
+  const res = await apiPost('register',{name});
+  btn.disabled=false; btn.textContent='✅ Đăng ký';
+  if(!res.ok){ err.textContent=res.error||'Lỗi, thử lại'; return; }
+  err.textContent='';
+  player={name:res.name, weekScore:0, dailyAddDone:0, dailyMulDone:0};
+  localStorage.setItem(PLAYER_KEY, res.name);
+  afterLogin();
+}
+
+async function afterLogin(){
+  document.getElementById('header-score').style.display='flex';
+  document.getElementById('hs-score').textContent=player.weekScore;
+  await refreshMenuUI();
+  showScreen('screen-menu');
+}
+
+async function refreshMenuUI(){
+  document.getElementById('menu-player-name').textContent=player.name;
+  document.getElementById('menu-player-score').textContent=player.weekScore;
+  document.getElementById('hs-score').textContent=player.weekScore;
+  document.getElementById('dp-add').textContent=player.dailyAddDone;
+  document.getElementById('dp-mul').textContent=player.dailyMulDone;
+
+  // Load LB for rank
+  const lb = await apiGet('leaderboard');
+  if(lb.ok){
+    const rank = lb.lb.findIndex(e=>e.name===player.name)+1;
+    document.getElementById('menu-player-rank').textContent = rank>0?`Hạng #${rank}`:'Chưa có điểm';
+    // Show prev week best
+    if(lb.prevBest && lb.prevBest.name){
+      document.getElementById('prev-best-banner').style.display='block';
+      document.getElementById('pb-name').textContent='🌟 '+lb.prevBest.name;
+      document.getElementById('pb-score').textContent=lb.prevBest.score+' điểm';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// QUESTION GENERATION
+// ═══════════════════════════════════════════
+function genAddQuestion(){
+  const hiddenPart = ['op','a','b','result'][Math.floor(Math.random()*4)];
+  let a,b,op,result;
+  op = Math.random()<.5?'+':'-';
+  if(op==='+'){
+    a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(11-a));
+    result=a+b;
+  } else {
+    a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(a+1));
+    result=a-b;
+  }
+  return {a,b,op,result,hidden:hiddenPart,mode:'add'};
+}
+
+function genMulQuestion(){
+  const x=Math.floor(Math.random()*9)+1;
+  const y=Math.floor(Math.random()*9)+1;
+  const hidden=Math.random()<.5?'a':'result';
+  return {a:x,b:y,op:'×',result:x*y,hidden,mode:'mul'};
+}
+
+function getAnswer(q){
+  if(q.hidden==='op') return q.op;
+  if(q.hidden==='a') return q.a;
+  if(q.hidden==='b') return q.b;
+  return q.result;
+}
+
+function genWrongAnswers(correct, q){
+  const wrongs=new Set();
+  while(wrongs.size<3){
+    let w;
+    if(q.hidden==='op'){ w=['+','-','×','÷'].filter(o=>o!==correct)[Math.floor(Math.random()*3)]; }
+    else {
+      const delta=Math.floor(Math.random()*5)+1;
+      w=Math.random()<.5?correct+delta:Math.max(0,correct-delta);
+      if(q.mode==='mul'&&q.hidden==='result') w=Math.max(1,w);
+    }
+    if(w!==correct) wrongs.add(w);
+  }
+  return [...wrongs];
+}
+
+function renderQuestion(q){
+  const blank='<span class="question-blank">?</span>';
+  let txt='';
+  if(q.hidden==='op')   txt=`${q.a} ${blank} ${q.b} = ${q.result}`;
+  else if(q.hidden==='a') txt=`${blank} ${q.op} ${q.b} = ${q.result}`;
+  else if(q.hidden==='b') txt=`${q.a} ${q.op} ${blank} = ${q.result}`;
+  else                  txt=`${q.a} ${q.op} ${q.b} = ${blank}`;
+  document.getElementById('question-text').innerHTML=txt;
+}
+
+function renderAnswers(q){
+  const correct=getAnswer(q);
+  const wrongs=genWrongAnswers(correct,q);
+  const options=[correct,...wrongs].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('answers-grid');
+  grid.innerHTML='';
+  options.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';
+    btn.textContent=opt;
+    btn.onclick=()=>selectAnswer(btn,opt,correct,q);
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════
+// LESSON FLOW
+// ═══════════════════════════════════════════
+function startLesson(mode){
+  const daily=mode==='add'?player.dailyAddDone:player.dailyMulDone;
+  if(daily>=30){
+    alert('Hôm nay bé đã làm đủ 30 câu '+( mode==='add'?'cộng trừ':'nhân')+' rồi! Ngày mai tiếp tục nhé 😊');
+    return;
+  }
+  lessonMode=mode;
+  const remaining=30-daily;
+  const count=Math.min(10,remaining);
+  questions=[];
+  for(let i=0;i<count;i++) questions.push(mode==='add'?genAddQuestion():genMulQuestion());
+  qIndex=0; sessionScore=0; answered=false; earnedThisQ=false; wrongCount=0;
+  document.getElementById('gi-lesson').textContent=mode==='add'?'Bài 1: Cộng Trừ':'Bài 2: Nhân';
+  document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
+  document.getElementById('score-change').textContent='';
+  showQuestion();
+  showScreen('screen-game');
+}
+
+function showQuestion(){
+  const q=questions[qIndex];
+  answered=false; earnedThisQ=false; wrongCount=0;
+  document.getElementById('gi-progress').textContent=(qIndex+1)+'/'+questions.length;
+  document.getElementById('progress-fill').style.width=((qIndex/questions.length)*100)+'%';
+  document.getElementById('score-change').textContent='';
+  document.getElementById('btn-next').classList.remove('enabled');
+  renderQuestion(q);
+  renderAnswers(q);
+}
+
+async function selectAnswer(btn, chosen, correct, q){
+  if(answered && earnedThisQ) return; // already correct
+
+  const allBtns=document.querySelectorAll('.ans-btn');
+
+  if(String(chosen)===String(correct)){
+    // Correct
+    btn.classList.add('correct');
+    allBtns.forEach(b=>b.disabled=true);
+    answered=true;
+
+    if(!earnedThisQ){
+      earnedThisQ=true;
+      let pts=0;
+      if(q.mode==='add') pts=1;
+      else pts=(q.a<6||q.b<6)?2:4;
+      player.weekScore+=pts;
+      sessionScore+=pts;
+      showScoreChange('+'+pts, 'plus');
+      document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
+      document.getElementById('hs-score').textContent=player.weekScore;
+      // Save to server
+      apiPost('score',{name:player.name, delta:pts, mode:lessonMode});
+    }
+    document.getElementById('btn-next').classList.add('enabled');
+  } else {
+    // Wrong
+    btn.classList.add('wrong');
+    btn.disabled=true;
+    wrongCount++;
+    if(player.weekScore>0){
+      player.weekScore=Math.max(0,player.weekScore-1);
+      sessionScore=Math.max(-999,sessionScore-1);
+      showScoreChange('-1','minus');
+      document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
+      document.getElementById('hs-score').textContent=player.weekScore;
+      apiPost('score',{name:player.name, delta:-1, mode:lessonMode});
+    }
+    // Highlight correct after 2 wrongs
+    if(wrongCount>=2){
+      allBtns.forEach(b=>{ if(String(b.textContent)===String(correct)) b.classList.add('correct'); });
+    }
+  }
+}
+
+function showScoreChange(text, cls){
+  const el=document.getElementById('score-change');
+  el.textContent=text; el.className='score-change '+cls;
+  setTimeout(()=>el.textContent='',1200);
+}
+
+async function nextQuestion(){
+  // Update daily count
+  const newDone=(lessonMode==='add'?player.dailyAddDone:player.dailyMulDone)+1;
+  if(lessonMode==='add') player.dailyAddDone=newDone;
+  else player.dailyMulDone=newDone;
+  apiPost('daily',{name:player.name, mode:lessonMode, count:newDone});
+
+  qIndex++;
+  if(qIndex>=questions.length){
+    // Batch done
+    const daily=lessonMode==='add'?player.dailyAddDone:player.dailyMulDone;
+    if(daily>=30){
+      // All done for the day — show result
+      maybeInterstitial(()=>showResult());
+    } else {
+      // Break time
+      document.getElementById('break-score').textContent=player.weekScore+' điểm';
+      const rem=30-daily;
+      document.getElementById('break-remaining').textContent='Còn '+rem+' câu nữa hôm nay';
+      document.getElementById('break-continue').style.display=rem>0?'block':'none';
+      showScreen('screen-break');
+    }
+  } else {
+    showQuestion();
+  }
+}
+
+function continueLesson(){
+  startLesson(lessonMode);
+}
+
+async function showResult(){
+  document.getElementById('result-score').textContent=player.weekScore+' điểm';
+  showScreen('screen-result');
+  initResultBanner();
+  const lb=await apiGet('leaderboard');
+  if(lb.ok){
+    const rank=lb.lb.findIndex(e=>e.name===player.name)+1;
+    document.getElementById('result-rank').textContent=rank>0?'Hạng #'+rank+' tuần này':'Chưa có trong top 10';
+    renderLB(lb.lb, 'result-lb');
+  }
+}
+
+// ═══════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════
+async function showLeaderboard(fromResult){
+  const lb=await apiGet('leaderboard');
+  if(lb.ok){
+    document.getElementById('lb-sub').textContent='Top 10 tuần này';
+    renderLB(lb.lb,'lb-list');
+  }
+  showScreen('screen-lb');
+}
+
+function renderLB(lb, containerId){
+  const el=document.getElementById(containerId);
+  if(!lb||lb.length===0){ el.innerHTML='<p style="text-align:center;color:#9080b0;padding:16px">Chưa có dữ liệu</p>'; return; }
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=lb.map((e,i)=>{
+    const isMe=e.name===player.name;
+    let cls='lb-row'; if(i===0)cls+=' top1'; else if(i===1)cls+=' top2'; else if(i===2)cls+=' top3'; if(isMe)cls+=' me';
+    return `<div class="${cls}">
+      <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
+      <div class="lb-name">${e.name}${isMe?' 👈':''}</div>
+      <div class="lb-score">⭐ ${e.score}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════
+(async function boot(){
+  initBanners();
+  // Try auto-login from localStorage
+  const saved=localStorage.getItem(PLAYER_KEY);
+  if(saved){
+    document.getElementById('login-input').value=saved;
+    const res=await apiPost('login',{name:saved});
+    if(res.ok){
+      player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone};
+      await afterLogin();
+      return;
+    }
+  }
+  showScreen('screen-login');
+})();
+
+// Enter key support
+document.getElementById('login-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('reg-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doRegister(); });
+</script>
+</body>
+</html>
