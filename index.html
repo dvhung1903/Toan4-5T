@@ -204,6 +204,14 @@ input.name-input:focus{border-color:#7c4dff;}
 .page-content h2{font-size:18px;font-weight:800;color:#3a2a6a;margin-bottom:12px;}
 .page-content h3{font-size:15px;font-weight:700;color:#5a3a9a;margin:14px 0 6px;}
 .page-content p{color:#6a5a8a;margin-bottom:8px;}
+
+/* Gender picker */
+.gender-row{display:flex;gap:10px;margin-bottom:12px;}
+.gender-btn{flex:1;padding:14px 8px;border-radius:16px;border:3px solid #e0d8f8;background:#f8f6ff;font-size:28px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;}
+.gender-btn span{font-size:12px;font-weight:700;color:#9080b0;}
+.gender-btn.selected{border-color:#7c4dff;background:#ede7ff;}
+.gender-btn:active{transform:scale(.95);}
+#ad-break,#ad-menu{width:100%;min-height:50px;margin:10px 0;text-align:center;}
 </style>
 </head>
 <body>
@@ -213,13 +221,14 @@ input.name-input:focus{border-color:#7c4dff;}
   <h1>🧮 Cùng Bé Học Toán</h1>
   <div id="header-score" style="display:none">⭐ <span id="hs-score">0</span></div>
   <div id="header-btns">
+    <button class="hbtn" id="music-btn" onclick="toggleMusic()">🎵</button>
     <button class="hbtn" onclick="showAbout()">ℹ️</button>
     <button class="hbtn" onclick="showPrivacy()">🔒</button>
   </div>
 </div>
 
 <!-- ══ TOP BANNER AD ══ -->
-<div class="ad-banner">
+<div class="ad-banner" id="ad-top" style="display:none;">
   <ins class="adsbygoogle"
        style="display:block;width:100%;min-height:60px;"
        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
@@ -251,6 +260,15 @@ input.name-input:focus{border-color:#7c4dff;}
     <div class="card-title">Đăng ký tên mới</div>
     <div class="card-sub">4–16 ký tự · Không trùng với bạn khác</div>
     <input id="reg-input" class="name-input" maxlength="16" placeholder="Đặt tên cho bé..." autocomplete="off" spellcheck="false"/>
+    <div style="font-size:13px;font-weight:700;color:#7060a0;margin-bottom:8px;text-align:center">Bé là ai? 👇</div>
+    <div class="gender-row">
+      <button class="gender-btn selected" id="gender-boy" onclick="selectGender('boy')">
+        👦<span>Bé trai</span>
+      </button>
+      <button class="gender-btn" id="gender-girl" onclick="selectGender('girl')">
+        👧<span>Bé gái</span>
+      </button>
+    </div>
     <div id="reg-err" class="err-msg"></div>
     <button class="btn-primary" id="reg-btn" onclick="doRegister()">✅ Đăng ký</button>
     <div style="text-align:center">
@@ -266,8 +284,17 @@ input.name-input:focus{border-color:#7c4dff;}
     <div class="pb2-name" id="pb-name">—</div>
     <div class="pb2-score" id="pb-score">0 điểm</div>
   </div>
+  <!-- Menu banner ad -->
+  <div id="ad-menu">
+    <ins class="adsbygoogle"
+         style="display:block;width:100%;min-height:50px;"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="SLOT_BANNER_MENU"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
   <div class="player-badge">
-    <span style="font-size:28px">🧒</span>
+    <span id="menu-avatar" style="font-size:28px">👦</span>
     <div>
       <div class="pb-name" id="menu-player-name">Bé</div>
       <div class="pb-rank" id="menu-player-rank">Hạng —</div>
@@ -308,6 +335,7 @@ input.name-input:focus{border-color:#7c4dff;}
     <div class="game-info" id="gi-lesson">Bài 1</div>
     <div class="game-info" id="gi-progress">1/10</div>
     <div class="game-info" id="gi-score">⭐ 0</div>
+    <button class="game-info" style="cursor:pointer;border:none;background:rgba(255,255,255,0.25);color:#fff;font-size:13px;font-weight:700;" onclick="confirmGoMenu()">🏠</button>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   <div class="question-card">
@@ -326,7 +354,16 @@ input.name-input:focus{border-color:#7c4dff;}
     <div class="card-title">Nghỉ giải lao nào!</div>
     <div class="card-sub">Bé đã làm xong 10 câu rồi 🎉</div>
     <div class="result-score" id="break-score">0 điểm</div>
-    <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:16px" id="break-remaining"></div>
+    <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:8px" id="break-remaining"></div>
+    <!-- Break banner ad -->
+    <div id="ad-break">
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:50px;"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="SLOT_BANNER_BREAK"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <button class="btn-primary" id="break-continue" onclick="continueLesson()">▶ Tiếp tục!</button>
     <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);margin-top:10px" onclick="goMenu()">🏠 Về menu</button>
   </div>
@@ -334,9 +371,11 @@ input.name-input:focus{border-color:#7c4dff;}
 
 <!-- ══ SCREEN: RESULT ══ -->
 <div id="screen-result" class="screen">
-  <div class="break-emoji">🎊</div>
+  <div class="break-emoji" id="result-emoji">🎊</div>
   <div class="card">
     <div class="card-title">Hoàn thành bài học!</div>
+    <div id="result-encourage" style="font-size:22px;font-weight:800;text-align:center;margin:8px 0 4px;color:#7c4dff"></div>
+    <div id="result-msg" style="font-size:14px;text-align:center;color:#9080b0;margin-bottom:8px"></div>
     <div class="result-score" id="result-score">0 điểm</div>
     <div class="result-rank" id="result-rank">Hạng —</div>
     <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:16px">📅 Hôm nay bé đã dùng hết lượt rồi, ngày mai tiếp tục nhé!</div>
@@ -372,9 +411,9 @@ input.name-input:focus{border-color:#7c4dff;}
 <div id="interstitial">
   <div id="inter-box">
     <div id="inter-top">
-      <span>Quảng cáo</span>
-      <span id="inter-cd">5s</span>
-      <button id="inter-skip" disabled onclick="closeInter()">Bỏ qua ✕</button>
+      <span>Quảng cáo · tự đóng sau</span>
+      <span id="inter-cd" style="font-size:18px;font-weight:800;color:#c8b0f0;min-width:32px;text-align:center">5</span>
+      <span style="font-size:11px">giây</span>
     </div>
     <div id="inter-content">
       <ins class="adsbygoogle"
@@ -438,11 +477,13 @@ const PLAYER_KEY = 'mathgame_player_v1';
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let player = { name:'', weekScore:0, dailyAddDone:0, dailyMulDone:0 };
-let lessonMode = 'add'; // 'add' | 'mul'
+let player = { name:'', weekScore:0, dailyAddDone:0, dailyMulDone:0, gender:'boy' };
+let selectedGender = 'boy';
+let lessonMode = 'add';
 let questions = [];
 let qIndex = 0;
 let sessionScore = 0;
+let sessionMaxScore = 0; // điểm tối đa có thể đạt trong batch này
 let answered = false;
 let earnedThisQ = false;
 let wrongCount = 0;
@@ -453,6 +494,133 @@ let _interCb = null;
 let _bannerTopLoaded = false;
 let _bannerResultLoaded = false;
 
+// ═══════════════════════════════════════════
+// AUDIO ENGINE (Web Audio API — no files needed)
+// ═══════════════════════════════════════════
+const AC = new (window.AudioContext||window.webkitAudioContext)();
+let musicOn = true;
+let bgNodes = []; // oscillators for bg music
+let bgScheduler = null;
+let bgBeat = 0;
+
+function resumeAC(){ if(AC.state==='suspended') AC.resume(); }
+
+// Play a short tone
+function playTone(freq, type, dur, vol, delay=0){
+  if(!musicOn) return;
+  resumeAC();
+  const o=AC.createOscillator(), g=AC.createGain();
+  o.connect(g); g.connect(AC.destination);
+  o.type=type; o.frequency.value=freq;
+  const t=AC.currentTime+delay;
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+0.01);
+  g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  o.start(t); o.stop(t+dur+0.05);
+}
+
+// Noise burst (for click)
+function playNoise(dur,vol){
+  if(!musicOn) return;
+  resumeAC();
+  const buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource(), g=AC.createGain();
+  const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=800;
+  src.buffer=buf; src.connect(f); f.connect(g); g.connect(AC.destination);
+  g.gain.setValueAtTime(vol,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
+  src.start(); src.stop(AC.currentTime+dur+0.05);
+}
+
+// Sound effects
+const snd={
+  click: ()=>{ playTone(600,'sine',0.08,0.15); playNoise(0.06,0.08); },
+  correct: ()=>{
+    [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.18,0.18,i*0.07));
+  },
+  wrong: ()=>{
+    playTone(200,'sawtooth',0.25,0.2);
+    playTone(160,'sawtooth',0.2,0.15,0.1);
+  },
+  next: ()=>{ playTone(440,'sine',0.1,0.12); playTone(550,'sine',0.1,0.1,0.06); },
+  cheer: ()=>{
+    // Fanfare
+    [523,659,784,1047,1319].forEach((f,i)=>playTone(f,'triangle',0.25,0.22,i*0.08));
+  },
+  encourageLight: ()=>{
+    [440,523].forEach((f,i)=>playTone(f,'sine',0.2,0.15,i*0.1));
+  },
+  encourageGood: ()=>{
+    [523,659,784].forEach((f,i)=>playTone(f,'sine',0.2,0.18,i*0.08));
+  },
+  encourageGreat: ()=>{
+    [523,659,784,1047].forEach((f,i)=>playTone(f,'triangle',0.22,0.2,i*0.07));
+  },
+  excellent: ()=>{
+    // Big fanfare + sparkle
+    [523,659,784,1047,1319,1568].forEach((f,i)=>playTone(f,'triangle',0.3,0.22,i*0.07));
+    setTimeout(()=>[784,1047,1319].forEach((f,i)=>playTone(f,'sine',0.2,0.18,i*0.06)),600);
+  },
+};
+
+// ── Background Music ──
+// Happy children tune: C-E-G-E-F-A-G pattern
+const MELODY_NOTES=[
+  523,587,659,587,  // C D E D
+  698,784,698,659,  // F G F E
+  523,659,784,659,  // C E G E
+  698,784,880,784,  // F G A G
+];
+const BASS_NOTES=[131,165,196,165, 175,196,175,165, 131,165,196,165, 175,196,220,196];
+let melodyIdx=0;
+
+function bgTick(){
+  if(!musicOn) return;
+  resumeAC();
+  const bpm=120, ms=60000/bpm*0.5; // eighth notes
+
+  // Melody
+  const mf=MELODY_NOTES[melodyIdx%MELODY_NOTES.length];
+  playTone(mf,'triangle',0.22,0.08);
+
+  // Bass every 2 beats
+  if(melodyIdx%2===0){
+    const bf=BASS_NOTES[Math.floor(melodyIdx/2)%BASS_NOTES.length];
+    playTone(bf,'sine',0.3,0.06);
+  }
+
+  // Percussion: hi-hat every beat, kick every 4
+  playNoise(0.04,0.04);
+  if(melodyIdx%8===0) playTone(80,'sine',0.15,0.1);
+
+  melodyIdx++;
+  bgScheduler=setTimeout(bgTick, ms);
+}
+
+function startBgMusic(){
+  if(bgScheduler) return;
+  melodyIdx=0;
+  bgTick();
+}
+function stopBgMusic(){
+  if(bgScheduler){ clearTimeout(bgScheduler); bgScheduler=null; }
+}
+function toggleMusic(){
+  musicOn=!musicOn;
+  const btn=document.getElementById('music-btn');
+  if(btn) btn.textContent=musicOn?'🎵':'🔇';
+  if(musicOn){ startBgMusic(); }
+  else { stopBgMusic(); }
+}
+
+// Add click sound to all buttons automatically
+document.addEventListener('click', e=>{
+  if(e.target.matches('button,a,.ans-btn,.menu-card,.gender-btn')){
+    snd.click();
+  }
+}, true);
 // ═══════════════════════════════════════════
 // SCREEN MANAGEMENT
 // ═══════════════════════════════════════════
@@ -494,9 +662,23 @@ function initBanners(){
     if(!_bannerTopLoaded){
       (window.adsbygoogle=window.adsbygoogle||[]).push({});
       _bannerTopLoaded=true;
+      document.getElementById('ad-top').style.display='block';
     }
   } catch(e){}
 }
+
+let _bannerMenuLoaded=false, _bannerBreakLoaded=false;
+function initMenuBanner(){
+  try{ if(!_bannerMenuLoaded){ (window.adsbygoogle=window.adsbygoogle||[]).push({}); _bannerMenuLoaded=true; } } catch(e){}
+}
+function initBreakBanner(){
+  try{ if(!_bannerBreakLoaded){ (window.adsbygoogle=window.adsbygoogle||[]).push({}); _bannerBreakLoaded=true; } } catch(e){}
+}
+
+function confirmGoMenu(){
+  if(confirm('Về menu? Tiến độ bài này sẽ không được lưu.')) goMenu();
+}
+
 function initResultBanner(){
   try{
     if(!_bannerResultLoaded){
@@ -506,6 +688,7 @@ function initResultBanner(){
   } catch(e){}
 }
 
+// Interstitial — no skip, strictly 5s countdown then auto-close
 function maybeInterstitial(cb){
   deathCount++;
   if(deathCount % 3 !== 0){ cb(); return; }
@@ -513,23 +696,18 @@ function maybeInterstitial(cb){
   ov.classList.add('show');
   _interCb = cb;
   if(!_interLoaded){
-    try{
-      (window.adsbygoogle=window.adsbygoogle||[]).push({});
-      _interLoaded=true;
-    } catch(e){}
+    try{ (window.adsbygoogle=window.adsbygoogle||[]).push({}); _interLoaded=true; } catch(e){}
   }
   let secs=5;
   const cd=document.getElementById('inter-cd');
-  const sk=document.getElementById('inter-skip');
-  cd.textContent=secs+'s'; sk.disabled=true;
+  cd.textContent=secs;
   clearInterval(_interTimer);
   _interTimer=setInterval(()=>{
     secs--;
-    cd.textContent=secs>0?secs+'s':'';
+    cd.textContent=secs>0?secs:'';
     if(secs<=0){
       clearInterval(_interTimer);
-      sk.disabled=false;
-      _interTimer=setTimeout(()=>closeInter(),2000);
+      closeInter();
     }
   },1000);
 }
@@ -537,6 +715,14 @@ function closeInter(){
   clearInterval(_interTimer); clearTimeout(_interTimer);
   document.getElementById('interstitial').classList.remove('show');
   if(typeof _interCb==='function'){ const c=_interCb; _interCb=null; c(); }
+}
+
+// Gender helpers
+function genderIcon(g){ return g==='girl'?'👧':'👦'; }
+function selectGender(g){
+  selectedGender=g;
+  document.getElementById('gender-boy').classList.toggle('selected', g==='boy');
+  document.getElementById('gender-girl').classList.toggle('selected', g==='girl');
 }
 
 // ═══════════════════════════════════════════
@@ -573,7 +759,8 @@ async function doLogin(){
   btn.disabled=false; btn.textContent='▶ Bắt đầu!';
   if(!res.ok){ err.textContent=res.error||'Không tìm thấy tên, hãy đăng ký'; return; }
   err.textContent='';
-  player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone};
+  const savedGender = localStorage.getItem(PLAYER_KEY+'_gender')||'boy';
+  player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone, gender:savedGender};
   localStorage.setItem(PLAYER_KEY, res.name);
   afterLogin();
 }
@@ -588,8 +775,9 @@ async function doRegister(){
   btn.disabled=false; btn.textContent='✅ Đăng ký';
   if(!res.ok){ err.textContent=res.error||'Lỗi, thử lại'; return; }
   err.textContent='';
-  player={name:res.name, weekScore:0, dailyAddDone:0, dailyMulDone:0};
+  player={name:res.name, weekScore:0, dailyAddDone:0, dailyMulDone:0, gender:selectedGender};
   localStorage.setItem(PLAYER_KEY, res.name);
+  localStorage.setItem(PLAYER_KEY+'_gender', selectedGender);
   afterLogin();
 }
 
@@ -597,6 +785,8 @@ async function afterLogin(){
   document.getElementById('header-score').style.display='flex';
   document.getElementById('hs-score').textContent=player.weekScore;
   await refreshMenuUI();
+  initMenuBanner();
+  startBgMusic();
   showScreen('screen-menu');
 }
 
@@ -606,13 +796,13 @@ async function refreshMenuUI(){
   document.getElementById('hs-score').textContent=player.weekScore;
   document.getElementById('dp-add').textContent=player.dailyAddDone;
   document.getElementById('dp-mul').textContent=player.dailyMulDone;
+  // Update avatar icon
+  document.getElementById('menu-avatar').textContent=genderIcon(player.gender);
 
-  // Load LB for rank
   const lb = await apiGet('leaderboard');
   if(lb.ok){
     const rank = lb.lb.findIndex(e=>e.name===player.name)+1;
     document.getElementById('menu-player-rank').textContent = rank>0?`Hạng #${rank}`:'Chưa có điểm';
-    // Show prev week best
     if(lb.prevBest && lb.prevBest.name){
       document.getElementById('prev-best-banner').style.display='block';
       document.getElementById('pb-name').textContent='🌟 '+lb.prevBest.name;
@@ -722,6 +912,12 @@ function startLesson(mode){
   questions=[];
   for(let i=0;i<count;i++) questions.push(mode==='add'?genAddQuestion():genMulQuestion());
   qIndex=0; sessionScore=0; answered=false; earnedThisQ=false; wrongCount=0;
+  // Tính điểm tối đa có thể đạt: add=1/câu, mul=2 hoặc 4/câu
+  sessionMaxScore = questions.reduce((sum,q)=>{
+    if(q.mode==='add') return sum+1;
+    return sum+((q.a<6||q.b<6)?2:4);
+  }, 0);
+  startBgMusic();
   document.getElementById('gi-lesson').textContent=mode==='add'?'Bài 1: Cộng Trừ':'Bài 2: Nhân';
   document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
   document.getElementById('score-change').textContent='';
@@ -750,9 +946,9 @@ async function selectAnswer(btn, q){
     : chosen === currentCorrect;
 
   if(isCorrect){
-    // ✅ Đúng (hoặc cả hai đều đúng với dualOp)
+    // ✅ Đúng
     btn.classList.add('correct');
-    // Nếu dualOp: highlight cả 2 đáp án đúng
+    snd.correct();
     if(Array.isArray(currentCorrect)){
       document.querySelectorAll('.ans-btn').forEach(b=>{
         if(currentCorrect.includes(b.textContent.trim())) b.classList.add('correct');
@@ -779,6 +975,7 @@ async function selectAnswer(btn, q){
     // ❌ Sai
     btn.classList.add('wrong');
     btn.disabled = true;
+    snd.wrong();
     wrongCount++;
     if(player.weekScore > 0){
       player.weekScore = Math.max(0, player.weekScore-1);
@@ -787,7 +984,6 @@ async function selectAnswer(btn, q){
       document.getElementById('hs-score').textContent = player.weekScore;
       apiPost('score', {name:player.name, delta:-1, mode:lessonMode});
     }
-    // Sau 2 lần sai: highlight đáp án đúng + cho next
     if(wrongCount >= 2){
       document.querySelectorAll('.ans-btn').forEach(b=>{
         const val = b.textContent.trim();
@@ -828,6 +1024,7 @@ async function nextQuestion(){
       const rem=30-daily;
       document.getElementById('break-remaining').textContent='Còn '+rem+' câu nữa hôm nay';
       document.getElementById('break-continue').style.display=rem>0?'block':'none';
+      initBreakBanner();
       showScreen('screen-break');
     }
   } else {
@@ -840,6 +1037,29 @@ function continueLesson(){
 }
 
 async function showResult(){
+  // Tính % điểm đạt được trong session này
+  const pct = sessionMaxScore > 0 ? Math.round(sessionScore/sessionMaxScore*100) : 0;
+  let emoji='🎊', encourage='', msg='';
+  if(pct===100){
+    emoji='🏆'; encourage='Xuất sắc! 🌟';
+    msg='Bé giỏi quá! Làm đúng tất cả rồi! Bé thật tuyệt vời!';
+    snd.excellent();
+  } else if(pct>=90){
+    emoji='🎉'; encourage='Rất tốt! 👏';
+    msg='Bé học giỏi lắm! Chỉ còn một chút nữa là hoàn hảo rồi!';
+    snd.encourageGreat();
+  } else if(pct>=70){
+    emoji='😊'; encourage='Khá giỏi! 👍';
+    msg='Bé làm tốt lắm! Cố gắng thêm một chút nữa nhé!';
+    snd.encourageGood();
+  } else {
+    emoji='💪'; encourage='Cố gắng lên! 🌈';
+    msg='Không sao, lần sau bé sẽ làm tốt hơn! Tiếp tục cố gắng nhé!';
+    snd.encourageLight();
+  }
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-encourage').textContent=encourage;
+  document.getElementById('result-msg').textContent=msg;
   document.getElementById('result-score').textContent=player.weekScore+' điểm';
   showScreen('screen-result');
   initResultBanner();
@@ -869,10 +1089,12 @@ function renderLB(lb, containerId){
   const medals=['🥇','🥈','🥉'];
   el.innerHTML=lb.map((e,i)=>{
     const isMe=e.name===player.name;
+    // Gender icon: stored in entry or fallback
+    const icon = e.gender==='girl'?'👧':'👦';
     let cls='lb-row'; if(i===0)cls+=' top1'; else if(i===1)cls+=' top2'; else if(i===2)cls+=' top3'; if(isMe)cls+=' me';
     return `<div class="${cls}">
       <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
-      <div class="lb-name">${e.name}${isMe?' 👈':''}</div>
+      <div class="lb-name">${icon} ${e.name}${isMe?' 👈':''}</div>
       <div class="lb-score">⭐ ${e.score}</div>
     </div>`;
   }).join('');
@@ -889,7 +1111,8 @@ function renderLB(lb, containerId){
     document.getElementById('login-input').value=saved;
     const res=await apiPost('login',{name:saved});
     if(res.ok){
-      player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone};
+      const savedGender=localStorage.getItem(PLAYER_KEY+'_gender')||'boy';
+      player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone, gender:savedGender};
       await afterLogin();
       return;
     }
