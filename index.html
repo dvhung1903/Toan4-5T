@@ -653,18 +653,22 @@ function getAnswer(q){
 }
 
 function genWrongAnswers(correct, q){
-  const wrongs=new Set();
-  while(wrongs.size<3){
-    let w;
-    if(q.hidden==='op'){ w=['+','-','×','÷'].filter(o=>o!==correct)[Math.floor(Math.random()*3)]; }
-    else {
-      const delta=Math.floor(Math.random()*5)+1;
-      w=Math.random()<.5?correct+delta:Math.max(0,correct-delta);
-      if(q.mode==='mul'&&q.hidden==='result') w=Math.max(1,w);
-    }
-    if(w!==correct) wrongs.add(w);
+  const wrongs=[];
+  if(q.hidden==='op'){
+    // Luôn dùng 3 toán tử còn lại
+    const allOps=['+','-','×','÷'];
+    const others=allOps.filter(o=>o!==correct);
+    return others.slice(0,3);
   }
-  return [...wrongs];
+  // Số: sinh 3 số sai khác nhau và khác correct
+  const used=new Set([correct]);
+  while(wrongs.length<3){
+    const delta=Math.floor(Math.random()*6)+1;
+    let w=Math.random()<.5?correct+delta:Math.max(0,correct-delta);
+    if(q.mode==='mul'&&q.hidden==='result') w=Math.max(1,w);
+    if(!used.has(w)){ used.add(w); wrongs.push(w); }
+  }
+  return wrongs;
 }
 
 function renderQuestion(q){
@@ -686,8 +690,10 @@ function renderAnswers(q){
   options.forEach(opt=>{
     const btn=document.createElement('button');
     btn.className='ans-btn';
-    btn.textContent=opt;
-    btn.onclick=()=>selectAnswer(btn,opt,correct,q);
+    btn.textContent=String(opt);
+    btn.dataset.value=String(opt);
+    btn.dataset.correct=String(correct);
+    btn.onclick=()=>selectAnswer(btn,q);
     grid.appendChild(btn);
   });
 }
@@ -725,47 +731,50 @@ function showQuestion(){
   renderAnswers(q);
 }
 
-async function selectAnswer(btn, chosen, correct, q){
-  if(answered && earnedThisQ) return; // already correct
+async function selectAnswer(btn, q){
+  if(earnedThisQ) return; // đã trả lời đúng rồi, không làm gì
 
-  const allBtns=document.querySelectorAll('.ans-btn');
+  const chosen = btn.dataset.value;
+  const correct = btn.dataset.correct;
 
-  if(String(chosen)===String(correct)){
-    // Correct
+  if(chosen === correct){
+    // ✅ Đúng
     btn.classList.add('correct');
-    allBtns.forEach(b=>b.disabled=true);
+    document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
+    earnedThisQ=true;
     answered=true;
 
-    if(!earnedThisQ){
-      earnedThisQ=true;
-      let pts=0;
-      if(q.mode==='add') pts=1;
-      else pts=(q.a<6||q.b<6)?2:4;
-      player.weekScore+=pts;
-      sessionScore+=pts;
-      showScoreChange('+'+pts, 'plus');
-      document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
-      document.getElementById('hs-score').textContent=player.weekScore;
-      // Save to server
-      apiPost('score',{name:player.name, delta:pts, mode:lessonMode});
-    }
+    let pts=0;
+    if(q.mode==='add') pts=1;
+    else pts=(q.a<6||q.b<6)?2:4;
+    player.weekScore+=pts;
+    sessionScore+=pts;
+    showScoreChange('+'+pts,'plus');
+    document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
+    document.getElementById('hs-score').textContent=player.weekScore;
+    apiPost('score',{name:player.name, delta:pts, mode:lessonMode});
     document.getElementById('btn-next').classList.add('enabled');
+
   } else {
-    // Wrong
+    // ❌ Sai
     btn.classList.add('wrong');
     btn.disabled=true;
     wrongCount++;
     if(player.weekScore>0){
       player.weekScore=Math.max(0,player.weekScore-1);
-      sessionScore=Math.max(-999,sessionScore-1);
       showScoreChange('-1','minus');
       document.getElementById('gi-score').textContent='⭐ '+player.weekScore;
       document.getElementById('hs-score').textContent=player.weekScore;
       apiPost('score',{name:player.name, delta:-1, mode:lessonMode});
     }
-    // Highlight correct after 2 wrongs
+    // Sau 2 lần sai: highlight đáp án đúng
     if(wrongCount>=2){
-      allBtns.forEach(b=>{ if(String(b.textContent)===String(correct)) b.classList.add('correct'); });
+      document.querySelectorAll('.ans-btn').forEach(b=>{
+        if(b.dataset.value===correct) b.classList.add('correct');
+        b.disabled=true;
+      });
+      // Vẫn cho next nhưng không cộng điểm
+      document.getElementById('btn-next').classList.add('enabled');
     }
   }
 }
