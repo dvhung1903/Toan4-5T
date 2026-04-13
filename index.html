@@ -214,6 +214,56 @@ input.name-input:focus{border-color:#7c4dff;}
 #ad-break,#ad-menu{width:100%;min-height:50px;margin:10px 0;text-align:center;}
 #tt-grid .menu-card{padding:10px 4px;border-radius:14px;}
 #tt-header{background:rgba(255,255,255,0.1);border-radius:14px;padding:8px 12px;}
+
+/* ── AVATAR PICKER MODAL ── */
+#avatar-modal{
+  display:none;position:fixed;inset:0;z-index:50000;
+  background:rgba(10,6,28,0.92);
+  align-items:flex-end;justify-content:center;
+  padding:0;
+}
+#avatar-modal.show{display:flex;}
+#avatar-box{
+  background:#fff;border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;
+  max-height:85vh;overflow-y:auto;
+  padding:20px 16px 32px;
+}
+#avatar-box h3{font-size:17px;font-weight:800;color:#3a2a6a;margin-bottom:4px;}
+#avatar-box .sub{font-size:12px;color:#9080b0;margin-bottom:14px;}
+.avatar-section-title{font-size:12px;font-weight:700;color:#9080b0;letter-spacing:.5px;margin:14px 0 8px;}
+.avatar-emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:4px;}
+.av-btn{
+  width:100%;aspect-ratio:1;border-radius:14px;border:2.5px solid transparent;
+  background:#f0eeff;font-size:26px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.av-btn:active{transform:scale(.9);}
+.av-btn.selected{border-color:#7c4dff;background:#ede7ff;}
+.upload-btn{
+  width:100%;padding:14px;border-radius:14px;border:2px dashed #c8b0f0;
+  background:#f8f6ff;color:#7c4dff;font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:12px;
+}
+.upload-btn:active{background:#ede7ff;}
+#avatar-preview{
+  width:80px;height:80px;border-radius:50%;
+  border:3px solid #7c4dff;
+  object-fit:cover;display:none;margin:0 auto 12px;
+}
+#av-save{
+  width:100%;padding:14px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,#7c4dff,#651fff);
+  color:#fff;font-size:16px;font-weight:800;cursor:pointer;
+  margin-top:8px;
+}
+#av-save:active{transform:scale(.97);}
+#av-cancel{
+  width:100%;padding:10px;border:none;background:none;
+  color:#9080b0;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;
+}
 </style>
 </head>
 <body>
@@ -295,8 +345,11 @@ input.name-input:focus{border-color:#7c4dff;}
          data-ad-format="auto"
          data-full-width-responsive="true"></ins>
   </div>
-  <div class="player-badge">
-    <span id="menu-avatar" style="font-size:28px">👦</span>
+  <div class="player-badge" onclick="showAvatarPicker()" style="cursor:pointer;">
+    <div style="position:relative;flex-shrink:0;">
+      <div id="menu-avatar" style="width:48px;height:48px;border-radius:50%;background:#ede7ff;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;border:2px solid #7c4dff;">👦</div>
+      <div style="position:absolute;bottom:-2px;right:-2px;background:#7c4dff;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;">✏️</div>
+    </div>
     <div>
       <div class="pb-name" id="menu-player-name">Bé</div>
       <div class="pb-rank" id="menu-player-rank">Hạng —</div>
@@ -312,15 +365,15 @@ input.name-input:focus{border-color:#7c4dff;}
         <div class="mc-title">Bài 1</div>
         <div class="mc-desc">Cộng & Trừ 0–10</div>
       </button>
-      <button class="menu-card" onclick="startLesson('mul')">
-        <div class="mc-icon">✖️</div>
-        <div class="mc-title">Bài 2</div>
-        <div class="mc-desc">Kiểm tra phép nhân</div>
-      </button>
       <button class="menu-card" onclick="showTimesTableMenu()">
         <div class="mc-icon">📖</div>
-        <div class="mc-title">Bài 3</div>
+        <div class="mc-title">Bài 2</div>
         <div class="mc-desc">Học bảng cửu chương</div>
+      </button>
+      <button class="menu-card" onclick="startLesson('mul')">
+        <div class="mc-icon">✖️</div>
+        <div class="mc-title">Bài 3</div>
+        <div class="mc-desc">Kiểm tra phép nhân</div>
       </button>
       <button class="menu-card" onclick="showLeaderboard(false)">
         <div class="mc-icon">🏆</div>
@@ -413,7 +466,7 @@ input.name-input:focus{border-color:#7c4dff;}
 <div id="screen-tt-menu" class="screen">
   <div style="width:100%;display:flex;align-items:center;gap:10px;margin-bottom:12px;">
     <button class="page-back-btn" style="margin-bottom:0" onclick="goMenu()">← Menu</button>
-    <span style="font-size:16px;font-weight:800;color:#fff;">📖 Học Bảng Cửu Chương</span>
+    <span style="font-size:16px;font-weight:800;color:#fff;">📖 Bài 2 — Học Bảng Cửu Chương</span>
   </div>
   <div class="card" style="padding:16px">
     <div class="card-sub" style="margin-bottom:12px">Chọn bảng cửu chương bé muốn học</div>
@@ -436,6 +489,34 @@ input.name-input:focus{border-color:#7c4dff;}
   </div>
   <div class="answers-grid" id="tt-answers"></div>
   <button class="btn-next" id="tt-next" onclick="ttNext()">Câu tiếp theo →</button>
+</div>
+
+<!-- ══ AVATAR PICKER MODAL ══ -->
+<div id="avatar-modal">
+  <div id="avatar-box">
+    <h3>🎨 Đổi ảnh đại diện</h3>
+    <div class="sub">Chọn emoji hoặc tải ảnh từ máy</div>
+
+    <!-- Upload from phone -->
+    <label class="upload-btn" for="avatar-file-input">
+      📷 Chọn ảnh từ điện thoại
+    </label>
+    <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>
+    <img id="avatar-preview" alt="Ảnh đã chọn"/>
+
+    <!-- Emoji library -->
+    <div class="avatar-section-title">BÉ TRAI</div>
+    <div class="avatar-emoji-grid" id="av-grid-boy"></div>
+    <div class="avatar-section-title">BÉ GÁI</div>
+    <div class="avatar-emoji-grid" id="av-grid-girl"></div>
+    <div class="avatar-section-title">CON VẬT CUTE</div>
+    <div class="avatar-emoji-grid" id="av-grid-animal"></div>
+    <div class="avatar-section-title">SIÊU NHÂN & PHÉP THUẬT</div>
+    <div class="avatar-emoji-grid" id="av-grid-hero"></div>
+
+    <button id="av-save" onclick="saveAvatar()">✅ Lưu ảnh đại diện</button>
+    <button id="av-cancel" onclick="closeAvatarPicker()">Hủy</button>
+  </div>
 </div>
 
 <!-- ══ INTERSTITIAL AD ══ -->
@@ -755,6 +836,121 @@ function selectGender(g){
 }
 
 // ═══════════════════════════════════════════
+// AVATAR SYSTEM
+// ═══════════════════════════════════════════
+const AVATAR_KEY = 'mathgame_avatar_v1';
+
+// Avatar emoji collections
+const AV_BOY   = ['👦','🧒','👶','🧑','👱','🧔','🧑‍💻','🧑‍🎨','🧑‍🚀','🧑‍🎤','🤴','🧑‍🏫'];
+const AV_GIRL  = ['👧','🧒','👶','👩','👱‍♀️','🧑‍🎨','👩‍💻','👩‍🎤','👸','🧑‍🏫','🧕','💁‍♀️'];
+const AV_ANIMAL= ['🐶','🐱','🐻','🐼','🐨','🐯','🦊','🐸','🐧','🦄','🐙','🦋'];
+const AV_HERO  = ['🦸','🦸‍♀️','🧙','🧝','🧜','🧚','🤖','👾','🎃','⭐','🌟','💫'];
+
+let pendingAvatar = null; // emoji string or base64 image data
+
+function loadAvatar(){
+  try{ return localStorage.getItem(AVATAR_KEY)||null; } catch(e){ return null; }
+}
+function saveAvatarToStorage(val){
+  try{ localStorage.setItem(AVATAR_KEY, val); } catch(e){}
+}
+
+function renderAvatarEl(el, avatarVal){
+  // avatarVal: emoji string OR base64 data URL
+  if(!avatarVal) avatarVal = genderIcon(player.gender||'boy');
+  if(avatarVal.startsWith('data:')){
+    el.innerHTML=`<img src="${avatarVal}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    el.style.fontSize='0';
+  } else {
+    el.innerHTML=avatarVal;
+    el.style.fontSize='28px';
+  }
+}
+
+function updateAllAvatars(val){
+  const el = document.getElementById('menu-avatar');
+  if(el) renderAvatarEl(el, val);
+}
+
+function showAvatarPicker(){
+  resumeAC();
+  pendingAvatar = loadAvatar() || genderIcon(player.gender);
+  document.getElementById('avatar-preview').style.display='none';
+
+  // Build emoji grids
+  function buildGrid(gridId, emojis){
+    const grid=document.getElementById(gridId);
+    grid.innerHTML='';
+    emojis.forEach(em=>{
+      const btn=document.createElement('button');
+      btn.className='av-btn'+(pendingAvatar===em?' selected':'');
+      btn.textContent=em;
+      btn.onclick=()=>{
+        pendingAvatar=em;
+        document.getElementById('avatar-preview').style.display='none';
+        document.querySelectorAll('.av-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        snd.click();
+      };
+      grid.appendChild(btn);
+    });
+  }
+  buildGrid('av-grid-boy',   AV_BOY);
+  buildGrid('av-grid-girl',  AV_GIRL);
+  buildGrid('av-grid-animal',AV_ANIMAL);
+  buildGrid('av-grid-hero',  AV_HERO);
+
+  document.getElementById('avatar-modal').classList.add('show');
+}
+
+function closeAvatarPicker(){
+  document.getElementById('avatar-modal').classList.remove('show');
+  pendingAvatar=null;
+}
+
+function handleAvatarUpload(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){
+    alert('Ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 2MB.');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const data=ev.target.result;
+    // Compress/resize using canvas
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const MAX=200;
+      let w=img.width, h=img.height;
+      if(w>h){ if(w>MAX){h=Math.round(h*MAX/w);w=MAX;} }
+      else { if(h>MAX){w=Math.round(w*MAX/h);h=MAX;} }
+      canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      pendingAvatar=compressed;
+      // Show preview
+      const prev=document.getElementById('avatar-preview');
+      prev.src=compressed; prev.style.display='block';
+      document.querySelectorAll('.av-btn').forEach(b=>b.classList.remove('selected'));
+      snd.correct();
+    };
+    img.src=data;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveAvatar(){
+  if(!pendingAvatar) return;
+  saveAvatarToStorage(pendingAvatar);
+  updateAllAvatars(pendingAvatar);
+  closeAvatarPicker();
+  snd.cheer();
+}
+
+// ═══════════════════════════════════════════
 // API CALLS
 // ═══════════════════════════════════════════
 async function apiPost(action, body){
@@ -825,8 +1021,9 @@ async function refreshMenuUI(){
   document.getElementById('hs-score').textContent=player.weekScore;
   document.getElementById('dp-add').textContent=player.dailyAddDone;
   document.getElementById('dp-mul').textContent=player.dailyMulDone;
-  // Update avatar icon
-  document.getElementById('menu-avatar').textContent=genderIcon(player.gender);
+  // Update avatar
+  const savedAv = loadAvatar();
+  renderAvatarEl(document.getElementById('menu-avatar'), savedAv || genderIcon(player.gender));
 
   const lb = await apiGet('leaderboard');
   if(lb.ok){
@@ -1235,10 +1432,12 @@ function renderLB(lb, containerId){
   const el=document.getElementById(containerId);
   if(!lb||lb.length===0){ el.innerHTML='<p style="text-align:center;color:#9080b0;padding:16px">Chưa có dữ liệu</p>'; return; }
   const medals=['🥇','🥈','🥉'];
+  const myAvatar = loadAvatar();
   el.innerHTML=lb.map((e,i)=>{
     const isMe=e.name===player.name;
-    // Gender icon: stored in entry or fallback
-    const icon = e.gender==='girl'?'👧':'👦';
+    const icon = isMe && myAvatar && myAvatar.startsWith('data:')
+      ? `<img src="${myAvatar}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;">`
+      : (isMe && myAvatar ? myAvatar : (e.gender==='girl'?'👧':'👦'));
     let cls='lb-row'; if(i===0)cls+=' top1'; else if(i===1)cls+=' top2'; else if(i===2)cls+=' top3'; if(isMe)cls+=' me';
     return `<div class="${cls}">
       <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
