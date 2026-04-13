@@ -212,6 +212,8 @@ input.name-input:focus{border-color:#7c4dff;}
 .gender-btn.selected{border-color:#7c4dff;background:#ede7ff;}
 .gender-btn:active{transform:scale(.95);}
 #ad-break,#ad-menu{width:100%;min-height:50px;margin:10px 0;text-align:center;}
+#tt-grid .menu-card{padding:10px 4px;border-radius:14px;}
+#tt-header{background:rgba(255,255,255,0.1);border-radius:14px;padding:8px 12px;}
 </style>
 </head>
 <body>
@@ -313,17 +315,17 @@ input.name-input:focus{border-color:#7c4dff;}
       <button class="menu-card" onclick="startLesson('mul')">
         <div class="mc-icon">✖️</div>
         <div class="mc-title">Bài 2</div>
-        <div class="mc-desc">Bảng cửu chương</div>
+        <div class="mc-desc">Kiểm tra phép nhân</div>
+      </button>
+      <button class="menu-card" onclick="showTimesTableMenu()">
+        <div class="mc-icon">📖</div>
+        <div class="mc-title">Bài 3</div>
+        <div class="mc-desc">Học bảng cửu chương</div>
       </button>
       <button class="menu-card" onclick="showLeaderboard(false)">
         <div class="mc-icon">🏆</div>
         <div class="mc-title">Bảng xếp hạng</div>
         <div class="mc-desc">Top 10 tuần này</div>
-      </button>
-      <button class="menu-card" onclick="showAbout()">
-        <div class="mc-icon">📚</div>
-        <div class="mc-title">Giới thiệu</div>
-        <div class="mc-desc">Cách chơi</div>
       </button>
     </div>
   </div>
@@ -405,6 +407,35 @@ input.name-input:focus{border-color:#7c4dff;}
     <div id="lb-list"></div>
     <button class="btn-primary" style="margin-top:12px" onclick="goMenu()">🏠 Về menu</button>
   </div>
+</div>
+
+<!-- ══ SCREEN: TIMES TABLE MENU (Bài 3) ══ -->
+<div id="screen-tt-menu" class="screen">
+  <div style="width:100%;display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <button class="page-back-btn" style="margin-bottom:0" onclick="goMenu()">← Menu</button>
+    <span style="font-size:16px;font-weight:800;color:#fff;">📖 Học Bảng Cửu Chương</span>
+  </div>
+  <div class="card" style="padding:16px">
+    <div class="card-sub" style="margin-bottom:12px">Chọn bảng cửu chương bé muốn học</div>
+    <div id="tt-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: TIMES TABLE STUDY ══ -->
+<div id="screen-tt" class="screen">
+  <div id="tt-header" style="display:flex;align-items:center;gap:8px;width:100%;margin-bottom:12px;">
+    <button class="page-back-btn" style="margin-bottom:0;flex-shrink:0" onclick="exitTimesTable()">← Quay lại</button>
+    <span id="tt-title" style="font-size:15px;font-weight:800;color:#fff;"></span>
+    <span id="tt-progress" style="font-size:13px;color:rgba(255,255,255,0.7);margin-left:auto;"></span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="tt-progress-fill" style="width:0%"></div></div>
+  <div class="question-card" style="margin-bottom:12px;">
+    <div class="question-label">BÉ CHỌN KẾT QUẢ ĐÚNG</div>
+    <div class="question-text" id="tt-question">2 × 1 = ?</div>
+    <div class="score-change" id="tt-feedback" style="min-height:28px;font-size:18px;font-weight:800;text-align:center;margin-top:4px;"></div>
+  </div>
+  <div class="answers-grid" id="tt-answers"></div>
+  <button class="btn-next" id="tt-next" onclick="ttNext()">Câu tiếp theo →</button>
 </div>
 
 <!-- ══ INTERSTITIAL AD ══ -->
@@ -579,21 +610,19 @@ let melodyIdx=0;
 function bgTick(){
   if(!musicOn) return;
   resumeAC();
-  const bpm=120, ms=60000/bpm*0.5; // eighth notes
+  const bpm=80, ms=60000/bpm*0.5; // slower, gentler
 
-  // Melody
+  // Soft melody — triangle wave, very low volume
   const mf=MELODY_NOTES[melodyIdx%MELODY_NOTES.length];
-  playTone(mf,'triangle',0.22,0.08);
+  playTone(mf,'triangle',0.35,0.04); // vol 0.04 = very soft
 
-  // Bass every 2 beats
-  if(melodyIdx%2===0){
-    const bf=BASS_NOTES[Math.floor(melodyIdx/2)%BASS_NOTES.length];
-    playTone(bf,'sine',0.3,0.06);
+  // Bass every 4 beats only
+  if(melodyIdx%4===0){
+    const bf=BASS_NOTES[Math.floor(melodyIdx/4)%BASS_NOTES.length];
+    playTone(bf,'sine',0.5,0.025); // very soft bass
   }
 
-  // Percussion: hi-hat every beat, kick every 4
-  playNoise(0.04,0.04);
-  if(melodyIdx%8===0) playTone(80,'sine',0.15,0.1);
+  // No percussion — cleaner, less distracting for kids
 
   melodyIdx++;
   bgScheduler=setTimeout(bgTick, ms);
@@ -812,29 +841,147 @@ async function refreshMenuUI(){
 }
 
 // ═══════════════════════════════════════════
-// QUESTION GENERATION
+// QUESTION GENERATION — no repeat within session
 // ═══════════════════════════════════════════
+let usedQKeys = new Set(); // tracks "a|op|b|hidden" to avoid repeats
+
+function qKey(q){ return `${q.a}|${q.op}|${q.b}|${q.hidden}`; }
+
 function genAddQuestion(){
-  const hiddenPart = ['op','a','b','result'][Math.floor(Math.random()*4)];
-  let a,b,op,result;
-  op = Math.random()<.5?'+':'-';
-  if(op==='+'){
-    a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(11-a));
-    result=a+b;
-  } else {
-    a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(a+1));
-    result=a-b;
-  }
-  // Khi ẩn dấu và một hạng số là 0 → cả + và - đều đúng
-  const dualOp = hiddenPart==='op' && (a===0 || b===0);
-  return {a,b,op,result,hidden:hiddenPart,mode:'add',dualOp};
+  let tries=0, q;
+  do {
+    const hiddenPart = ['op','a','b','result'][Math.floor(Math.random()*4)];
+    let a,b,op,result;
+    op = Math.random()<.5?'+':'-';
+    if(op==='+'){
+      a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(11-a));
+      result=a+b;
+    } else {
+      a=Math.floor(Math.random()*11); b=Math.floor(Math.random()*(a+1));
+      result=a-b;
+    }
+    const dualOp = hiddenPart==='op' && (a===0 || b===0);
+    q={a,b,op,result,hidden:hiddenPart,mode:'add',dualOp};
+    tries++;
+  } while(usedQKeys.has(qKey(q)) && tries<30);
+  usedQKeys.add(qKey(q));
+  return q;
 }
 
 function genMulQuestion(){
-  const x=Math.floor(Math.random()*9)+1;
-  const y=Math.floor(Math.random()*9)+1;
-  const hidden=Math.random()<.5?'a':'result';
-  return {a:x,b:y,op:'×',result:x*y,hidden,mode:'mul'};
+  let tries=0, q;
+  do {
+    const x=Math.floor(Math.random()*9)+1;
+    const y=Math.floor(Math.random()*9)+1;
+    const hidden=Math.random()<.5?'a':'result';
+    q={a:x,b:y,op:'×',result:x*y,hidden,mode:'mul'};
+    tries++;
+  } while(usedQKeys.has(qKey(q)) && tries<30);
+  usedQKeys.add(qKey(q));
+  return q;
+}
+
+// ═══════════════════════════════════════════
+// TIMES TABLE (Bài 3) — no scoring, must select correct to next
+// ═══════════════════════════════════════════
+let ttTable = 1;   // which times table (1-10)
+let ttIndex = 0;   // current question index (0-8 → 1×t to 9×t)
+let ttAnswered = false;
+
+function showTimesTableMenu(){
+  const grid = document.getElementById('tt-grid');
+  grid.innerHTML = '';
+  for(let i=1;i<=10;i++){
+    const btn = document.createElement('button');
+    btn.className = 'menu-card';
+    btn.style.cssText='padding:12px 6px;border-radius:14px;';
+    btn.innerHTML=`<div style="font-size:22px;font-weight:800;">×${i}</div><div style="font-size:11px;color:rgba(255,255,255,0.85)">Bảng ${i}</div>`;
+    btn.onclick=()=>startTimesTable(i);
+    grid.appendChild(btn);
+  }
+  showScreen('screen-tt-menu');
+}
+
+function startTimesTable(table){
+  ttTable=table; ttIndex=0; ttAnswered=false;
+  document.getElementById('tt-title').textContent=`Bảng nhân ${table}`;
+  showTTQuestion();
+  showScreen('screen-tt');
+}
+
+function showTTQuestion(){
+  const n = ttIndex+1; // 1 to 9 (then 10)
+  const result = ttTable * n;
+  document.getElementById('tt-question').innerHTML=
+    `${ttTable} × ${n} = <span class="question-blank">?</span>`;
+  document.getElementById('tt-progress').textContent=`${ttIndex+1}/9`;
+  document.getElementById('tt-progress-fill').style.width=((ttIndex/9)*100)+'%';
+  document.getElementById('tt-feedback').textContent='';
+  document.getElementById('tt-next').classList.remove('enabled');
+  ttAnswered=false;
+
+  // Generate 4 answer options
+  const correct=result;
+  const wrongs=new Set();
+  while(wrongs.size<3){
+    const d=Math.floor(Math.random()*5)+1;
+    const w=Math.random()<.5?correct+d*ttTable:Math.max(0,correct-d*ttTable);
+    if(w!==correct) wrongs.add(w);
+  }
+  const options=[correct,...wrongs].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('tt-answers');
+  grid.innerHTML='';
+  options.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';
+    btn.textContent=String(opt);
+    btn.onclick=()=>selectTTAnswer(btn,opt,correct);
+    grid.appendChild(btn);
+  });
+}
+
+function selectTTAnswer(btn,chosen,correct){
+  if(ttAnswered) return;
+  if(chosen===correct){
+    btn.classList.add('correct');
+    document.querySelectorAll('#tt-answers .ans-btn').forEach(b=>b.disabled=true);
+    ttAnswered=true;
+    document.getElementById('tt-feedback').innerHTML=
+      `<span style="color:#00c853">✅ ${ttTable} × ${ttIndex+1} = ${correct}</span>`;
+    snd.correct();
+    document.getElementById('tt-next').classList.add('enabled');
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled=true;
+    snd.wrong();
+    document.getElementById('tt-feedback').innerHTML=
+      `<span style="color:#e53935">❌ Sai rồi, thử lại nhé!</span>`;
+  }
+}
+
+function ttNext(){
+  ttIndex++;
+  if(ttIndex>=9){
+    // Done with this table
+    snd.cheer();
+    document.getElementById('tt-question').innerHTML=
+      `<span style="font-size:28px">🎉</span>`;
+    document.getElementById('tt-feedback').innerHTML=
+      `<span style="color:#7c4dff;font-size:16px;font-weight:800;">Bé đã học xong bảng nhân ${ttTable}!</span>`;
+    document.getElementById('tt-answers').innerHTML='';
+    document.getElementById('tt-progress-fill').style.width='100%';
+    document.getElementById('tt-progress').textContent='9/9';
+    const nextBtn=document.getElementById('tt-next');
+    nextBtn.textContent='← Chọn bảng khác';
+    nextBtn.classList.add('enabled');
+    nextBtn.onclick=()=>showTimesTableMenu();
+  } else {
+    showTTQuestion();
+  }
+}
+
+function exitTimesTable(){
+  showTimesTableMenu();
 }
 
 function getAnswer(q){
@@ -909,6 +1056,7 @@ function startLesson(mode){
   lessonMode=mode;
   const remaining=30-daily;
   const count=Math.min(10,remaining);
+  usedQKeys = new Set(); // reset no-repeat tracker
   questions=[];
   for(let i=0;i<count;i++) questions.push(mode==='add'?genAddQuestion():genMulQuestion());
   qIndex=0; sessionScore=0; answered=false; earnedThisQ=false; wrongCount=0;
