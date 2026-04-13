@@ -1,6 +1,11 @@
 import { Redis } from '@upstash/redis';
 
-const redis = Redis.fromEnv();
+// Vercel Upstash integration dùng KV_REST_API_URL / KV_REST_API_TOKEN
+// Fallback sang UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN nếu dùng manual
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 const PLAYERS_KEY = 'math_players';      // { name -> {score, weekScore, lastReset, dailyAdd, dailyMul} }
 const WEEKLY_KEY  = 'math_weekly_best';  // { name, score, week }
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
