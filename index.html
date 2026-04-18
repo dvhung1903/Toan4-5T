@@ -173,7 +173,6 @@ input.name-input:focus{border-color:#7c4dff;}
 /* ── BREAK / RESULT ── */
 .break-emoji{font-size:80px;text-align:center;margin:20px 0 12px;}
 .result-score{font-size:48px;font-weight:800;color:#7c4dff;text-align:center;margin:8px 0;}
-.result-rank{font-size:16px;color:#9080b0;text-align:center;margin-bottom:16px;}
 
 /* ── LEADERBOARD ── */
 .lb-row{
@@ -289,53 +288,8 @@ input.name-input:focus{border-color:#7c4dff;}
        data-full-width-responsive="true"></ins>
 </div>
 
-<!-- ══ SCREEN: LOGIN ══ -->
-<div id="screen-login" class="screen active">
-  <div class="big-emoji">🦉</div>
-  <div class="card">
-    <div class="card-title">Chào mừng bé!</div>
-    <div class="card-sub">Nhập tên để bắt đầu học toán nhé 😊</div>
-    <input id="login-input" class="name-input" maxlength="16" placeholder="Tên của bé..." autocomplete="off" spellcheck="false"/>
-    <div id="login-err" class="err-msg"></div>
-    <button class="btn-primary" id="login-btn" onclick="doLogin()">▶ Bắt đầu!</button>
-    <div style="text-align:center;margin-top:12px;font-size:12px;color:#9080b0">Chưa có tài khoản?</div>
-    <div style="text-align:center">
-      <button class="link-btn" onclick="switchToRegister()">Đăng ký tên mới →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN: REGISTER ══ -->
-<div id="screen-register" class="screen">
-  <div class="big-emoji">✏️</div>
-  <div class="card">
-    <div class="card-title">Đăng ký tên mới</div>
-    <div class="card-sub">4–16 ký tự · Không trùng với bạn khác</div>
-    <input id="reg-input" class="name-input" maxlength="16" placeholder="Đặt tên cho bé..." autocomplete="off" spellcheck="false"/>
-    <div style="font-size:13px;font-weight:700;color:#7060a0;margin-bottom:8px;text-align:center">Bé là ai? 👇</div>
-    <div class="gender-row">
-      <button class="gender-btn selected" id="gender-boy" onclick="selectGender('boy')">
-        👦<span>Bé trai</span>
-      </button>
-      <button class="gender-btn" id="gender-girl" onclick="selectGender('girl')">
-        👧<span>Bé gái</span>
-      </button>
-    </div>
-    <div id="reg-err" class="err-msg"></div>
-    <button class="btn-primary" id="reg-btn" onclick="doRegister()">✅ Đăng ký</button>
-    <div style="text-align:center">
-      <button class="link-btn" onclick="showScreen('screen-login')">← Đã có tài khoản</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══ SCREEN: MENU ══ -->
-<div id="screen-menu" class="screen">
-  <div id="prev-best-banner" style="display:none" class="prev-best">
-    <div class="pb2-title">🏆 NGƯỜI XUẤT SẮC TUẦN TRƯỚC</div>
-    <div class="pb2-name" id="pb-name">—</div>
-    <div class="pb2-score" id="pb-score">0 điểm</div>
-  </div>
+<div id="screen-menu" class="screen active">
   <!-- Menu banner ad -->
   <div id="ad-menu">
     <ins class="adsbygoogle"
@@ -352,7 +306,6 @@ input.name-input:focus{border-color:#7c4dff;}
     </div>
     <div>
       <div class="pb-name" id="menu-player-name">Bé</div>
-      <div class="pb-rank" id="menu-player-rank">Hạng —</div>
     </div>
     <div class="pb-score">⭐ <span id="menu-player-score">0</span></div>
   </div>
@@ -374,11 +327,6 @@ input.name-input:focus{border-color:#7c4dff;}
         <div class="mc-icon">✖️</div>
         <div class="mc-title">Bài 3</div>
         <div class="mc-desc">Kiểm tra phép nhân</div>
-      </button>
-      <button class="menu-card" onclick="showLeaderboard(false)">
-        <div class="mc-icon">🏆</div>
-        <div class="mc-title">Bảng xếp hạng</div>
-        <div class="mc-desc">Top 10 tuần này</div>
       </button>
     </div>
   </div>
@@ -432,12 +380,7 @@ input.name-input:focus{border-color:#7c4dff;}
     <div id="result-encourage" style="font-size:22px;font-weight:800;text-align:center;margin:8px 0 4px;color:#7c4dff"></div>
     <div id="result-msg" style="font-size:14px;text-align:center;color:#9080b0;margin-bottom:8px"></div>
     <div class="result-score" id="result-score">0 điểm</div>
-    <div class="result-rank" id="result-rank">Hạng —</div>
     <div style="font-size:13px;color:#9080b0;text-align:center;margin-bottom:16px">📅 Hôm nay bé đã dùng hết lượt rồi, ngày mai tiếp tục nhé!</div>
-
-    <!-- Leaderboard inside result -->
-    <div class="card-title" style="font-size:14px;margin-bottom:10px">🏆 Top 10 tuần này</div>
-    <div id="result-lb"></div>
 
     <!-- Banner ad in result -->
     <div class="ad-banner" style="margin:12px 0">
@@ -449,16 +392,6 @@ input.name-input:focus{border-color:#7c4dff;}
            data-full-width-responsive="true"></ins>
     </div>
     <button class="btn-primary" onclick="goMenu()">🏠 Về menu</button>
-  </div>
-</div>
-
-<!-- ══ SCREEN: LEADERBOARD ══ -->
-<div id="screen-lb" class="screen">
-  <div class="card">
-    <div class="card-title">🏆 Bảng Xếp Hạng</div>
-    <div class="card-sub" id="lb-sub">Top 10 tuần này</div>
-    <div id="lb-list"></div>
-    <button class="btn-primary" style="margin-top:12px" onclick="goMenu()">🏠 Về menu</button>
   </div>
 </div>
 
@@ -970,52 +903,9 @@ async function apiGet(action){
 }
 
 // ═══════════════════════════════════════════
-// LOGIN / REGISTER
+// MENU REFRESH
 // ═══════════════════════════════════════════
-function switchToRegister(){ showScreen('screen-register'); }
-
-async function doLogin(){
-  const name = document.getElementById('login-input').value.trim();
-  const err = document.getElementById('login-err');
-  const btn = document.getElementById('login-btn');
-  if(name.length<4||name.length>16){ err.textContent='Tên phải từ 4–16 ký tự'; return; }
-  btn.disabled=true; btn.textContent='Đang tải...';
-  const res = await apiPost('login',{name});
-  btn.disabled=false; btn.textContent='▶ Bắt đầu!';
-  if(!res.ok){ err.textContent=res.error||'Không tìm thấy tên, hãy đăng ký'; return; }
-  err.textContent='';
-  const savedGender = localStorage.getItem(PLAYER_KEY+'_gender')||'boy';
-  player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone, gender:savedGender};
-  localStorage.setItem(PLAYER_KEY, res.name);
-  afterLogin();
-}
-
-async function doRegister(){
-  const name = document.getElementById('reg-input').value.trim();
-  const err = document.getElementById('reg-err');
-  const btn = document.getElementById('reg-btn');
-  if(name.length<4||name.length>16){ err.textContent='Tên phải từ 4–16 ký tự'; return; }
-  btn.disabled=true; btn.textContent='Đang đăng ký...';
-  const res = await apiPost('register',{name});
-  btn.disabled=false; btn.textContent='✅ Đăng ký';
-  if(!res.ok){ err.textContent=res.error||'Lỗi, thử lại'; return; }
-  err.textContent='';
-  player={name:res.name, weekScore:0, dailyAddDone:0, dailyMulDone:0, gender:selectedGender};
-  localStorage.setItem(PLAYER_KEY, res.name);
-  localStorage.setItem(PLAYER_KEY+'_gender', selectedGender);
-  afterLogin();
-}
-
-async function afterLogin(){
-  document.getElementById('header-score').style.display='flex';
-  document.getElementById('hs-score').textContent=player.weekScore;
-  await refreshMenuUI();
-  initMenuBanner();
-  startBgMusic();
-  showScreen('screen-menu');
-}
-
-async function refreshMenuUI(){
+function refreshMenuUI(){
   document.getElementById('menu-player-name').textContent=player.name;
   document.getElementById('menu-player-score').textContent=player.weekScore;
   document.getElementById('hs-score').textContent=player.weekScore;
@@ -1024,17 +914,6 @@ async function refreshMenuUI(){
   // Update avatar
   const savedAv = loadAvatar();
   renderAvatarEl(document.getElementById('menu-avatar'), savedAv || genderIcon(player.gender));
-
-  const lb = await apiGet('leaderboard');
-  if(lb.ok){
-    const rank = lb.lb.findIndex(e=>e.name===player.name)+1;
-    document.getElementById('menu-player-rank').textContent = rank>0?`Hạng #${rank}`:'Chưa có điểm';
-    if(lb.prevBest && lb.prevBest.name){
-      document.getElementById('prev-best-banner').style.display='block';
-      document.getElementById('pb-name').textContent='🌟 '+lb.prevBest.name;
-      document.getElementById('pb-score').textContent=lb.prevBest.score+' điểm';
-    }
-  }
 }
 
 // ═══════════════════════════════════════════
@@ -1313,7 +1192,7 @@ async function selectAnswer(btn, q){
     showScoreChange('+'+pts, 'plus');
     document.getElementById('gi-score').textContent = '⭐ '+player.weekScore;
     document.getElementById('hs-score').textContent = player.weekScore;
-    apiPost('score', {name:player.name, delta:pts, mode:lessonMode});
+    localStorage.setItem(PLAYER_KEY+'_score', player.weekScore);
     document.getElementById('btn-next').classList.add('enabled');
 
   } else {
@@ -1327,7 +1206,7 @@ async function selectAnswer(btn, q){
       showScoreChange('-1', 'minus');
       document.getElementById('gi-score').textContent = '⭐ '+player.weekScore;
       document.getElementById('hs-score').textContent = player.weekScore;
-      apiPost('score', {name:player.name, delta:-1, mode:lessonMode});
+      localStorage.setItem(PLAYER_KEY+'_score', player.weekScore);
     }
     if(wrongCount >= 2){
       document.querySelectorAll('.ans-btn').forEach(b=>{
@@ -1354,7 +1233,8 @@ async function nextQuestion(){
   const newDone=(lessonMode==='add'?player.dailyAddDone:player.dailyMulDone)+1;
   if(lessonMode==='add') player.dailyAddDone=newDone;
   else player.dailyMulDone=newDone;
-  apiPost('daily',{name:player.name, mode:lessonMode, count:newDone});
+  localStorage.setItem(PLAYER_KEY+'_addDone', player.dailyAddDone);
+  localStorage.setItem(PLAYER_KEY+'_mulDone', player.dailyMulDone);
 
   qIndex++;
   if(qIndex>=questions.length){
@@ -1408,43 +1288,6 @@ async function showResult(){
   document.getElementById('result-score').textContent=player.weekScore+' điểm';
   showScreen('screen-result');
   initResultBanner();
-  const lb=await apiGet('leaderboard');
-  if(lb.ok){
-    const rank=lb.lb.findIndex(e=>e.name===player.name)+1;
-    document.getElementById('result-rank').textContent=rank>0?'Hạng #'+rank+' tuần này':'Chưa có trong top 10';
-    renderLB(lb.lb, 'result-lb');
-  }
-}
-
-// ═══════════════════════════════════════════
-// LEADERBOARD
-// ═══════════════════════════════════════════
-async function showLeaderboard(fromResult){
-  const lb=await apiGet('leaderboard');
-  if(lb.ok){
-    document.getElementById('lb-sub').textContent='Top 10 tuần này';
-    renderLB(lb.lb,'lb-list');
-  }
-  showScreen('screen-lb');
-}
-
-function renderLB(lb, containerId){
-  const el=document.getElementById(containerId);
-  if(!lb||lb.length===0){ el.innerHTML='<p style="text-align:center;color:#9080b0;padding:16px">Chưa có dữ liệu</p>'; return; }
-  const medals=['🥇','🥈','🥉'];
-  const myAvatar = loadAvatar();
-  el.innerHTML=lb.map((e,i)=>{
-    const isMe=e.name===player.name;
-    const icon = isMe && myAvatar && myAvatar.startsWith('data:')
-      ? `<img src="${myAvatar}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;">`
-      : (isMe && myAvatar ? myAvatar : (e.gender==='girl'?'👧':'👦'));
-    let cls='lb-row'; if(i===0)cls+=' top1'; else if(i===1)cls+=' top2'; else if(i===2)cls+=' top3'; if(isMe)cls+=' me';
-    return `<div class="${cls}">
-      <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
-      <div class="lb-name">${icon} ${e.name}${isMe?' 👈':''}</div>
-      <div class="lb-score">⭐ ${e.score}</div>
-    </div>`;
-  }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -1452,24 +1295,25 @@ function renderLB(lb, containerId){
 // ═══════════════════════════════════════════
 (async function boot(){
   initBanners();
-  // Try auto-login from localStorage
-  const saved=localStorage.getItem(PLAYER_KEY);
-  if(saved){
-    document.getElementById('login-input').value=saved;
-    const res=await apiPost('login',{name:saved});
-    if(res.ok){
-      const savedGender=localStorage.getItem(PLAYER_KEY+'_gender')||'boy';
-      player={name:res.name, weekScore:res.weekScore, dailyAddDone:res.dailyAddDone, dailyMulDone:res.dailyMulDone, gender:savedGender};
-      await afterLogin();
-      return;
-    }
-  }
-  showScreen('screen-login');
+  // Load saved score from localStorage
+  const savedScore = parseInt(localStorage.getItem(PLAYER_KEY+'_score')||'0')||0;
+  const savedAdd   = parseInt(localStorage.getItem(PLAYER_KEY+'_addDone')||'0')||0;
+  const savedMul   = parseInt(localStorage.getItem(PLAYER_KEY+'_mulDone')||'0')||0;
+  const savedGender= localStorage.getItem(PLAYER_KEY+'_gender')||'boy';
+  // Reset daily counts if date changed
+  const savedDate  = localStorage.getItem(PLAYER_KEY+'_date')||'';
+  const today      = new Date().toISOString().slice(0,10);
+  const dailyAddDone = savedDate===today ? savedAdd : 0;
+  const dailyMulDone = savedDate===today ? savedMul : 0;
+  if(savedDate!==today) localStorage.setItem(PLAYER_KEY+'_date', today);
+  player = { name:'Bé', weekScore: savedScore, dailyAddDone, dailyMulDone, gender: savedGender };
+  document.getElementById('header-score').style.display='flex';
+  document.getElementById('hs-score').textContent = player.weekScore;
+  refreshMenuUI();
+  initMenuBanner();
+  startBgMusic();
+  showScreen('screen-menu');
 })();
-
-// Enter key support
-document.getElementById('login-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
-document.getElementById('reg-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doRegister(); });
 </script>
 </body>
 </html>
